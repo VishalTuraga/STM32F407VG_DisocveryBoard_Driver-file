@@ -1,0 +1,9 @@
+../drivers/Src/stm32f407xx_spi.c:27:6:SPI_PeriheralControl	3
+../drivers/Src/stm32f407xx_spi.c:57:6:SPI_ClockControl	8
+../drivers/Src/stm32f407xx_spi.c:108:6:SPI_Init	4
+../drivers/Src/stm32f407xx_spi.c:175:6:SPI_Deinit	1
+../drivers/Src/stm32f407xx_spi.c:197:6:SPI_SendData	4
+../drivers/Src/stm32f407xx_spi.c:235:6:SPI_ReceiveData	1
+../drivers/Src/stm32f407xx_spi.c:257:6:SPI_IRQInterruptConfig	1
+../drivers/Src/stm32f407xx_spi.c:276:6:SPI_IRQPriorityConfig	1
+../drivers/Src/stm32f407xx_spi.c:295:6:SPI_IRQHandling	1
