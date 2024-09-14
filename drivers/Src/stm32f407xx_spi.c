@@ -459,6 +459,15 @@ static void SPI_RXNE_ITHANDLE(SPI_Handle_t *pSPIHandle)
 	}
 }
 
+uint8_t SPI_GetFlagStatus(SPI_RegDef_t *pSPIx , uint32_t FlagName)
+{
+	if(pSPIx->SR & FlagName)
+	{
+		return FLAG_SET;
+	}
+	return FLAG_RESET;
+}
+
 static void SPI_OVR_ERR_ITHANDLE(SPI_Handle_t *pSPIHandle)
 {
 	uint8_t temp;
@@ -520,7 +529,7 @@ void SPI_IRQHandling(SPI_Handle_t *pSPIHandle)
  * @Note			-
  *
  *************************************************************************************************/
-void SPI_SendDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pTxBuffer, uint32_t len)
+uint8_t SPI_SendDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pTxBuffer, uint32_t len)
 {
 	uint8_t state = pSPIHandle->TxState;
 
@@ -538,6 +547,7 @@ void SPI_SendDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pTxBuffer, uint32_t len)
 
 		// 4. Data transmission will be handled by the ISR code
 	}
+	return state;
 }
 
 /*************************************************************************************************
@@ -554,7 +564,7 @@ void SPI_SendDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pTxBuffer, uint32_t len)
  * @Note			-
  *
  *************************************************************************************************/
-void SPI_ReceiveDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pRxBuffer, uint32_t len)
+uint8_t SPI_ReceiveDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pRxBuffer, uint32_t len)
 {
 	uint8_t state = pSPIHandle->RxState;
 
@@ -572,6 +582,7 @@ void SPI_ReceiveDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pRxBuffer, uint32_t le
 
 		// 4. Data transmission will be handled by the ISR code
 	}
+	return state;
 }
 
 void SPI_CloseTransmission(SPI_Handle_t *pSPIHandle)

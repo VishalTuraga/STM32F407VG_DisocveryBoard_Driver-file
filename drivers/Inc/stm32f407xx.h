@@ -518,6 +518,8 @@ typedef struct
 #define RESET							DISABLE
 #define GPIO_PIN_SET					SET
 #define GPIO_PIN_RESET					RESET
+#define FLAG_SET						SET
+#define FLAG_RESET						RESET
 
 /*
  * SPI CR1 Bit Position Definitons

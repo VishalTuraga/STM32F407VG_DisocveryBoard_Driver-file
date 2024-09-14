@@ -60,8 +60,8 @@ typedef struct
 #define SPI_SCLKSPEED_FPCLK_2				0
 #define SPI_SCLKSPEED_FPCLK_4				1
 #define SPI_SCLKSPEED_FPCLK_8				2
-#define SPI_SCLKSPEED_FPCLK_1				3
-#define SPI_SCLKSPEED_FPCLK_3				4
+#define SPI_SCLKSPEED_FPCLK_16				3
+#define SPI_SCLKSPEED_FPCLK_32				4
 #define SPI_SCLKSPEED_FPCLK_64				5
 #define SPI_SCLKSPEED_FPCLK_128				6
 #define SPI_SCLKSPEED_FPCLK_256				7
@@ -100,6 +100,13 @@ typedef struct
 #define SPI_EVENT_RX_CMPLT					2			/*Reception is complete*/
 #define SPI_EVENT_OVR_ERR					3			/*OVR error in the SPI*/
 
+/*
+ * SPI related status flags definitions
+ */
+#define SPI_TXE_FLAG    					(1 << SPI_SR_TXE)
+#define SPI_RXNE_FLAG   					(1 << SPI_SR_RXNE)
+#define SPI_BUSY_FLAG   					(1 << SPI_SR_BSY)
+
 /**************************************************************************************************************************************
  * 														APIs supported by this driver
  * 									For more information about the APIs check the function definitions
@@ -113,6 +120,7 @@ void SPI_SSOEConfig(SPI_RegDef_t *pSPIx, uint8_t EnOrDi);
 void SPI_ClearOVRFlag(SPI_RegDef_t *pSPIx);
 void SPI_CloseTransmission(SPI_Handle_t *pSPIHandle);
 void SPI_CloseReception(SPI_Handle_t *pSPIHandle);
+uint8_t SPI_GetFlagStatus(SPI_RegDef_t *pSPIx , uint32_t FlagName);
 
 /*
  * Enable/Disable SPI peripheral
@@ -137,9 +145,9 @@ void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t len);
 
 void SPI_ReceiveData(SPI_RegDef_t *pSPIx, uint8_t *pRxBuffer, uint32_t len);
 
-void SPI_SendDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pTxBuffer, uint32_t len);
+uint8_t SPI_SendDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pTxBuffer, uint32_t len);
 
-void SPI_ReceiveDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pRxBuffer, uint32_t len);
+uint8_t SPI_ReceiveDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pRxBuffer, uint32_t len);
 
 /*
  * IRQ configuration and ISR Handling

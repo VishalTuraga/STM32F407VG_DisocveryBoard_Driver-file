@@ -58,8 +58,6 @@ SPI2_Inits(void)
 
 	SPI_Init(&SPI_2);
 
-	while(1);
-
 }
 
 int main(void)

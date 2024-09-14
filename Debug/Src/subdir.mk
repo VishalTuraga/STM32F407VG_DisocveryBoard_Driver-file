@@ -5,17 +5,17 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../Src/006_SPIMaster_Send_Receive.c \
+../Src/007SPIExercise.c \
 ../Src/syscalls.c \
 ../Src/sysmem.c 
 
 OBJS += \
-./Src/006_SPIMaster_Send_Receive.o \
+./Src/007SPIExercise.o \
 ./Src/syscalls.o \
 ./Src/sysmem.o 
 
 C_DEPS += \
-./Src/006_SPIMaster_Send_Receive.d \
+./Src/007SPIExercise.d \
 ./Src/syscalls.d \
 ./Src/sysmem.d 
 
@@ -27,7 +27,7 @@ Src/%.o Src/%.su Src/%.cyclo: ../Src/%.c Src/subdir.mk
 clean: clean-Src
 
 clean-Src:
-	-$(RM) ./Src/006_SPIMaster_Send_Receive.cyclo ./Src/006_SPIMaster_Send_Receive.d ./Src/006_SPIMaster_Send_Receive.o ./Src/006_SPIMaster_Send_Receive.su ./Src/syscalls.cyclo ./Src/syscalls.d ./Src/syscalls.o ./Src/syscalls.su ./Src/sysmem.cyclo ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su
+	-$(RM) ./Src/007SPIExercise.cyclo ./Src/007SPIExercise.d ./Src/007SPIExercise.o ./Src/007SPIExercise.su ./Src/syscalls.cyclo ./Src/syscalls.d ./Src/syscalls.o ./Src/syscalls.su ./Src/sysmem.cyclo ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su
 
 .PHONY: clean-Src
 
