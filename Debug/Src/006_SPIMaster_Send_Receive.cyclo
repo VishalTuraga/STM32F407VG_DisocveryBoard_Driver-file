@@ -1,0 +1,4 @@
+../Src/006_SPIMaster_Send_Receive.c:20:6:delay	2
+../Src/006_SPIMaster_Send_Receive.c:26:1:SPI2_GPIOInits	1
+../Src/006_SPIMaster_Send_Receive.c:47:1:SPI2_Inits	1
+../Src/006_SPIMaster_Send_Receive.c:65:5:main	1

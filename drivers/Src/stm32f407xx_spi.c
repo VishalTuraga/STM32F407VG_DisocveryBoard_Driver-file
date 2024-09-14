@@ -5,7 +5,11 @@
  *      Author: Vishal Turaga
  */
 #include "stm32f407xx_spi.h"
-#include <stdint.h>
+
+static void SPI_TXE_ITHANDLE(SPI_Handle_t *pSPIHandle);
+static void SPI_RXNE_ITHANDLE(SPI_Handle_t *pSPIHandle);
+static void SPI_OVR_ERR_ITHANDLE(SPI_Handle_t *pSPIHandle);
+
 
 /*
  * Enable/Disable SPI Bits
@@ -33,7 +37,8 @@ void SPI_SSIConfig(SPI_RegDef_t *pSPIx, uint8_t EnOrDi)
 	}
 	else
 	{
-		SPI2->CR1 & ~(1 << SPI_CR1_SSI);
+		SPI2->CR1 &= ~(1 << SPI_CR1_SSI);
+
 	}
 }
 
@@ -59,7 +64,7 @@ void SPI_SSOEConfig(SPI_RegDef_t *pSPIx, uint8_t EnOrDi)
 	}
 	else
 	{
-		SPI2->CR1 & ~(1 << SPI_CR2_SSOE);
+		SPI2->CR1 &= ~(1 << SPI_CR2_SSOE);
 	}
 }
 
@@ -80,7 +85,7 @@ void SPI_SSOEConfig(SPI_RegDef_t *pSPIx, uint8_t EnOrDi)
  * @Note			-
  *
  *************************************************************************************************/
-void SPI_PeriheralControl(SPI_RegDef_t *pSPIx, uint8_t EnOrDi)
+void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t EnOrDi)
 {
 	if(EnOrDi == ENABLE)
 	{
@@ -230,7 +235,7 @@ void SPI_Init(SPI_Handle_t *pSPIHandle)
  *************************************************************************************************/
 void SPI_Deinit(SPI_RegDef_t *pSPIx)
 {
-
+	SPI_ClockControl(pSPIx, DISABLE);
 }
 
 /*
@@ -403,6 +408,72 @@ void SPI_IRQPriorityConfig(uint8_t IRQNumber, uint32_t IRQPriority)
  * @Note			-
  *
  *************************************************************************************************/
+static void SPI_TXE_ITHANDLE(SPI_Handle_t *pSPIHandle)
+{
+	if((pSPIHandle->pSPIx->CR1 & (1 << SPI_CR1_DFF)) == SPI_DFF_8BIT)
+	{
+		// shift register is 16 bits
+		pSPIHandle->pSPIx->DR = *((uint16_t*)pSPIHandle->pTxBuffer);
+		pSPIHandle->TxLen-=2;
+		(uint16_t*)pSPIHandle->pTxBuffer++;
+	}
+	else
+	{
+		// shift register is 8 bits
+		pSPIHandle->pSPIx->DR = *(uint8_t*)pSPIHandle->pTxBuffer;
+		pSPIHandle->TxLen--;
+		pSPIHandle->pTxBuffer++;
+	}
+
+	if(!pSPIHandle->TxLen)
+	{
+		SPI_CloseTransmission(pSPIHandle);
+		SPI_ApplicationEventCallback(pSPIHandle, SPI_EVENT_TX_CMPLT); // this has to be implemented in the application
+	}
+
+}
+
+static void SPI_RXNE_ITHANDLE(SPI_Handle_t *pSPIHandle)
+{
+	if((pSPIHandle->pSPIx->CR1 & (1 << SPI_CR1_DFF)) == SPI_DFF_8BIT)
+	{
+		// shift register is 16 bits
+		*((uint16_t*)pSPIHandle->pRxBuffer) = (uint16_t)pSPIHandle->pSPIx->DR;
+		pSPIHandle->RxLen-=2;
+		pSPIHandle->pRxBuffer++;
+		pSPIHandle->pRxBuffer++;
+	}
+	else
+	{
+		// shift register is 8 bits
+		*(pSPIHandle->pRxBuffer) = (uint8_t)pSPIHandle->pSPIx->DR;
+		pSPIHandle->RxLen--;
+		pSPIHandle->pRxBuffer++;
+	}
+
+	if(!pSPIHandle->RxLen)
+	{
+		SPI_CloseReception(pSPIHandle);
+
+		SPI_ApplicationEventCallback(pSPIHandle, SPI_EVENT_RX_CMPLT); // this has to be implemented in the application
+	}
+}
+
+static void SPI_OVR_ERR_ITHANDLE(SPI_Handle_t *pSPIHandle)
+{
+	uint8_t temp;
+	// 1. clear the OVR flag
+	if(pSPIHandle->TxState != SPI_BUSY_IN_TX)
+	{
+		temp = pSPIHandle->pSPIx->DR;
+		temp = pSPIHandle->pSPIx->DR;
+	}
+	(void)temp; // doing this so that we don't get a warning that temp is not used
+
+	// 2. inform the application
+	SPI_ApplicationEventCallback(pSPIHandle, SPI_EVENT_OVR_ERR); // this has to be implemented in the application
+}
+
 void SPI_IRQHandling(SPI_Handle_t *pSPIHandle)
 {
 	uint8_t temp1, temp2;
@@ -412,7 +483,7 @@ void SPI_IRQHandling(SPI_Handle_t *pSPIHandle)
 	if(temp1 & temp2)
 	{
 		// handle TXE
-		SPI_TXE_ITHANDLE();
+		SPI_TXE_ITHANDLE(pSPIHandle);
 	}
 
 	temp1 = (pSPIHandle->pSPIx->SR  & (1<<SPI_SR_RXNE));
@@ -421,7 +492,7 @@ void SPI_IRQHandling(SPI_Handle_t *pSPIHandle)
 	if(temp1 & temp2)
 	{
 		// handle TXE
-		SPI_RXE_ITHANDLE();
+		SPI_RXNE_ITHANDLE(pSPIHandle);
 	}
 
 	// We are only checking for overrun flag in this course
@@ -431,7 +502,7 @@ void SPI_IRQHandling(SPI_Handle_t *pSPIHandle)
 	if(temp1 & temp2)
 	{
 		// handle TXE
-		SPI_OVR_ERR_ITHANDLE();
+		SPI_OVR_ERR_ITHANDLE(pSPIHandle);
 	}
 }
 
@@ -501,4 +572,29 @@ void SPI_ReceiveDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pRxBuffer, uint32_t le
 
 		// 4. Data transmission will be handled by the ISR code
 	}
+}
+
+void SPI_CloseTransmission(SPI_Handle_t *pSPIHandle)
+{
+	// if tx len is zero, close the SPI communication and inform the application that tx is over
+	// 1. disable the TXEIE bit
+	pSPIHandle->pSPIx->CR2 &= ~(1 << SPI_CR2_TXEIE);
+	// 2. reset the buffers
+	pSPIHandle->pTxBuffer = NULL;
+	pSPIHandle->TxLen = 0;
+	pSPIHandle->TxState = SPI_READY;
+	// 3. inform the application
+}
+void SPI_CloseReception(SPI_Handle_t *pSPIHandle)
+{
+	pSPIHandle->pSPIx->CR2 &= ~(1 << SPI_CR2_RXNEIE);
+
+	pSPIHandle->pRxBuffer = NULL;
+	pSPIHandle->RxLen = 0;
+	pSPIHandle->RxState = SPI_READY;
+}
+
+__weak void SPI_ApplicationEventCallback(SPI_Handle_t *pSPIHandle, uint8_t AppEv)
+{
+	// weak implementation so that can use it
 }

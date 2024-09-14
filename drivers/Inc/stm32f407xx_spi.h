@@ -93,6 +93,13 @@ typedef struct
 #define SPI_SSM_DI							0
 #define SPI_SSM_EN							1
 
+/*
+ * Possible SPI Application Events
+ */
+#define SPI_EVENT_TX_CMPLT					1			/*Transmission is complete*/
+#define SPI_EVENT_RX_CMPLT					2			/*Reception is complete*/
+#define SPI_EVENT_OVR_ERR					3			/*OVR error in the SPI*/
+
 /**************************************************************************************************************************************
  * 														APIs supported by this driver
  * 									For more information about the APIs check the function definitions
@@ -103,11 +110,14 @@ typedef struct
  */
 void SPI_SSIConfig(SPI_RegDef_t *pSPIx, uint8_t EnOrDi);
 void SPI_SSOEConfig(SPI_RegDef_t *pSPIx, uint8_t EnOrDi);
+void SPI_ClearOVRFlag(SPI_RegDef_t *pSPIx);
+void SPI_CloseTransmission(SPI_Handle_t *pSPIHandle);
+void SPI_CloseReception(SPI_Handle_t *pSPIHandle);
 
 /*
  * Enable/Disable SPI peripheral
  */
-void SPI_PeriheralControl(SPI_RegDef_t *pSPIx, uint8_t EnOrDi);
+void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t EnOrDi);
 
 /*
  * Clock control
@@ -137,5 +147,10 @@ void SPI_ReceiveDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pRxBuffer, uint32_t le
 void SPI_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi);
 void SPI_IRQPriorityConfig(uint8_t IRQNumber, uint32_t IRQPriority);
 void SPI_IRQHandling(SPI_Handle_t *pSPIHandle);
+
+/*
+ * Application callback
+ */
+void SPI_ApplicationEventCallback(SPI_Handle_t *pSPIHandle, uint8_t AppEv);
 
 #endif /* INC_STM32F407XX_SPI_H_ */
