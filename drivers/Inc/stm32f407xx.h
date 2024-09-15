@@ -189,10 +189,35 @@
 
 
 
- /******************************************peripheral register definition structures****************************************************/
- /*
-  * SPI peripheral register structure
-  */
+/******************************************peripheral register definition structures****************************************************/
+/*
+ * I2C peripheral register structure
+ */
+
+typedef struct
+{
+	__vo uin32_t CR1					/* Give a short description, address offset:0x04*/
+	__vo uin32_t CR2					/* Give a short description, address offset:0x04*/
+	__vo uin32_t OAR1					/* Give a short description, address offset:0x04*/
+	__vo uin32_t OAR2					/* Give a short description, address offset:0x04*/
+	__vo uin32_t DR						/* Give a short description, address offset:0x04*/
+	__vo uin32_t SR1					/* Give a short description, address offset:0x04*/
+	__vo uin32_t SR2					/* Give a short description, address offset:0x04*/
+	__vo uin32_t CCR					/* Give a short description, address offset:0x04*/
+	__vo uin32_t TRISE					/* Give a short description, address offset:0x04*/
+	__vo uin32_t FLTR					/* Give a short description, address offset:0x04*/
+}I2C_RegDef_t;
+
+/*
+ * Peripheral definitions (Peripheral base address typecased to xxx_RegDef_t)
+ */
+#define I2C1							((I2C_RegDef_t*)I2C1_BASEADDR)
+#define I2C2							((I2C_RegDef_t*)I2C2_BASEADDR)
+#define I2C3							((I2C_RegDef_t*)I2C3_BASEADDR)
+
+/*
+ * SPI peripheral register structure
+ */
 
 typedef struct
 {
@@ -215,8 +240,8 @@ typedef struct
 #define SPI3							((SPI_RegDef_t*)SPI3_I2S3_BASEADDR)
 
 /*
-  * GPIO peripheral register structure
-  */
+ * GPIO peripheral register structure
+ */
 
 typedef struct
 {
@@ -312,8 +337,8 @@ typedef struct
 	__vo uint32_t MEMRMP;							/*Give a short Description, address offset: 0x00*/
 	__vo uint32_t PMC;							/*Give a short Description, address offset: 0x00*/
 	__vo uint32_t EXTICR[4];							/*Give a short Description, address offset: 0x00*/
-		 uint32_t RESERVED1;
-		 uint32_t RESERVED2;
+	uint32_t RESERVED1;
+	uint32_t RESERVED2;
 	__vo uint32_t CMPCR;							/*Give a short Description, address offset: 0x00*/
 }SYSCFG_RegDef_t;
 
@@ -564,17 +589,45 @@ typedef struct
 #define SPI_SR_FRE						8
 
 /*
+ * I2C CR1 bit position definitions
+ */
+#define I2C_CR1_SWRST					15
+#define I2C_CR1_ALERT					13
+#define I2C_CR1_PEC						12
+#define I2C_CR1_POS						11
+#define I2C_CR1_ACK						10
+#define I2C_CR1_STOP					9
+#define I2C_CR1_START					8
+#define I2C_CR1_NOSTRETCH				7
+#define I2C_CR1_ENGC					6
+#define I2C_CR1_ENPEC					5
+#define I2C_CR1_ENARP					4
+#define I2C_CR1_SMBTYPE					3
+#define I2C_CR1_SMBUS					1
+#define I2C_CR1_PE						0
+
+/*
+ * I2C CR2 bit position definitions
+ */
+#define I2C_CR2_LAST					12
+#define I2C_CR2_DMAEN					11
+#define I2C_CR2_ITBUFEN					10
+#define I2C_CR2_ITEVTEN					9
+#define I2C_CR2_ITERREN					8
+#define I2C_CR2_FREQ					0
+
+/*
  * Generic functions
  */
 #define GPIO_BASEADDR_TO_CODE(x)		((x == GPIOA) ? 0 :\
-										(x == GPIOB) ? 1 :\
-										(x == GPIOC) ? 2 :\
-										(x == GPIOD) ? 3 :\
-										(x == GPIOE) ? 4 :\
+		(x == GPIOB) ? 1 :\
+				(x == GPIOC) ? 2 :\
+						(x == GPIOD) ? 3 :\
+								(x == GPIOE) ? 4 :\
 										(x == GPIOF) ? 5 :\
-										(x == GPIOG) ? 6 :\
-										(x == GPIOH) ? 7 :\
-										(x == GPIOI) ? 8 :0)
+												(x == GPIOG) ? 6 :\
+														(x == GPIOH) ? 7 :\
+																(x == GPIOI) ? 8 :0)
 
 #include "stm32f407xx_gpio.h"
 #include "stm32f407xx_spi.h"

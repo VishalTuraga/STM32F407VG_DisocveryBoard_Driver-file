@@ -235,7 +235,22 @@ void SPI_Init(SPI_Handle_t *pSPIHandle)
  *************************************************************************************************/
 void SPI_Deinit(SPI_RegDef_t *pSPIx)
 {
-	SPI_ClockControl(pSPIx, DISABLE);
+	if(pSPIx == SPI1)
+	{
+		RCC->APB2RSTR |= (1 << 12);
+		RCC->APB2RSTR &= ~(1 << 12);
+	}
+	else if(pSPIx == SPI2)
+	{
+		RCC->APB1RSTR |= (1 << 14);
+		RCC->APB1RSTR &= ~(1 << 14);
+	}
+	else if(pSPIx == SPI3)
+	{
+
+		RCC->APB1RSTR |= (1 << 15);
+		RCC->APB1RSTR &= ~(1 << 15);
+	}
 }
 
 /*
