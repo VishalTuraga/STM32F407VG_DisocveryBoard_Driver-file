@@ -617,6 +617,44 @@ typedef struct
 #define I2C_CR2_FREQ					0
 
 /*
+ * I2C SR1 bit position definitions
+ */
+#define I2C_SR1_SMBALERT				15
+#define I2C_SR1_TIMEOUT					14
+#define I2C_SR1_PECERR					12
+#define I2C_SR1_OVR						11
+#define I2C_SR1_AF						10
+#define I2C_SR1_ARLO					9
+#define I2C_SR1_BERR					8
+#define I2C_SR1_TxE						7
+#define I2C_SR1_RxNE					6
+#define I2C_SR1_STOPF					4
+#define I2C_SR1_ADD10					3
+#define I2C_SR1_BTF						2
+#define I2C_SR1_ADDR					1
+#define I2C_SR1_SB						0
+
+/*
+ * I2C SR2 bit position definitions
+ */
+#define I2C_SR2_PEC						8
+#define I2C_SR2_DUALF					7
+#define I2C_SR2_SMBHOST					6
+#define I2C_SR2_SMBDEFAUL				5
+#define I2C_SR2_GENCALL					4
+#define I2C_SR2_Reserved				3
+#define I2C_SR2_TRA						2
+#define I2C_SR2_BUSY					1
+#define I2C_SR2_MSL						0
+
+/*
+ * I2C CCR bit position definitions
+ */
+#define I2C_CCR_CCR						0
+#define I2C_CCR_DUTY					14
+#define I2C_CCR_FS						15
+
+/*
  * Generic functions
  */
 #define GPIO_BASEADDR_TO_CODE(x)		((x == GPIOA) ? 0 :\
