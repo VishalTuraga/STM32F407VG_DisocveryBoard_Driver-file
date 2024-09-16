@@ -669,5 +669,6 @@ typedef struct
 
 #include "stm32f407xx_gpio.h"
 #include "stm32f407xx_spi.h"
+#include "stm32f407xx_i2c.h"
 
 #endif /* INC_STM32F407XX_H_ */
