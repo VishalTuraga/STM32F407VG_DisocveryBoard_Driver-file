@@ -92,10 +92,10 @@ uint32_t RCC_GetPCLK1Value(void)
 		// HSE is used. Freq = 8MHz
 		ClkSrcFreq = 8000000;
 	}
-//	else if(clocksource == 2)
-//	{
-//		// PLL is used
-//	}
+	//	else if(clocksource == 2)
+	//	{
+	//		// PLL is used
+	//	}
 
 	// 2. Get the AHB prescalar
 	temp = ((RCC->CFGR >> 4) & 0xF);
@@ -143,15 +143,53 @@ uint32_t RCC_GetPCLK1Value(void)
  *************************************************************************************************/
 void I2C_Init(I2C_Handle_t *pI2CHandle)
 {
-	uin32_t tempreg = 0;
-
+	uint32_t tempreg = 0;
 	//1. Configure the mode (Standard or fast)
-	pI2CHandle->pI2Cx->CCR |= (1 << pI2CHandle->I2C_Config.I2C_SCLSpeed);
-	//2. Configure the speed of the serial clock
+	uint16_t ccr_value = 0;
+	tempreg = 0;
+	if(pI2CHandle->I2C_Config.I2C_SCLSpeed <= I2C_SCL_SPEED_SM_KHZ)
+	{
+		// mode is standard
+		ccr_value = RCC_GetPCLK1Value() / (2 * pI2CHandle->I2C_Config.I2C_SCLSpeed);
+		tempreg |= (ccr_value & 0xFFF);
+	}
+	else
+	{
+		// mode is fast mode
+		tempreg |= (1 << I2C_CCR_FS);
+		tempreg |= (pI2CHandle->I2C_Config.I2C_FMDutyCycle << I2C_CCR_DUTY);
+		if(pI2CHandle->I2C_Config.I2C_FMDutyCycle == I2C_DUTYCYCLE_2)
+		{
+			// Tlow = 2*Thigh
+			ccr_value = (RCC_GetPCLK1Value() / (3 * pI2CHandle->I2C_Config.I2C_SCLSpeed));
+
+		}
+		else
+		{
+			//  Tlow = 1.7*Thigh
+			ccr_value = (RCC_GetPCLK1Value() / (25 * pI2CHandle->I2C_Config.I2C_SCLSpeed));
+		}
+		tempreg |= (ccr_value & 0xFFF);
+	}
+	pI2CHandle->pI2Cx->CCR = tempreg;
+
+	//2. Configure the speed of the serial clock. Configure the FREQ field of CR2
+	tempreg = 0;
+	tempreg = RCC_GetPCLK1Value()/1000000U;
+	pI2CHandle->pI2Cx->CR2 |= (tempreg & 0x3F);
+
 	//3. Configure the device address (if the device is behaving as slave)
+	// configuring for only 7 bit mode
+	tempreg = pI2CHandle->I2C_Config.I2C_DeviceAddress << 1;
+	pI2CHandle->pI2Cx->OAR1 |= (1 << 14);
+	pI2CHandle->pI2Cx->OAR1 = tempreg;
+
 	//4. Enable the acking
 	pI2CHandle->pI2Cx->CR1 |= (pI2CHandle->I2C_Config.I2C_ACKControl << I2C_CR1_ACK);
+
 	//5. Configure the rise time for I2C pins (will discuss later)
+
+	// CCR calculations
 
 
 }

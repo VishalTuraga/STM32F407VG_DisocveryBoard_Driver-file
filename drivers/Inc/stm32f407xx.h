@@ -196,16 +196,16 @@
 
 typedef struct
 {
-	__vo uin32_t CR1					/* Give a short description, address offset:0x04*/
-	__vo uin32_t CR2					/* Give a short description, address offset:0x04*/
-	__vo uin32_t OAR1					/* Give a short description, address offset:0x04*/
-	__vo uin32_t OAR2					/* Give a short description, address offset:0x04*/
-	__vo uin32_t DR						/* Give a short description, address offset:0x04*/
-	__vo uin32_t SR1					/* Give a short description, address offset:0x04*/
-	__vo uin32_t SR2					/* Give a short description, address offset:0x04*/
-	__vo uin32_t CCR					/* Give a short description, address offset:0x04*/
-	__vo uin32_t TRISE					/* Give a short description, address offset:0x04*/
-	__vo uin32_t FLTR					/* Give a short description, address offset:0x04*/
+	__vo uin32_t CR1;					/* Give a short description, address offset:0x04*/
+	__vo uin32_t CR2;					/* Give a short description, address offset:0x04*/
+	__vo uin32_t OAR1;					/* Give a short description, address offset:0x04*/
+	__vo uin32_t OAR2;					/* Give a short description, address offset:0x04*/
+	__vo uin32_t DR;						/* Give a short description, address offset:0x04*/
+	__vo uin32_t SR1;					/* Give a short description, address offset:0x04*/
+	__vo uin32_t SR2;					/* Give a short description, address offset:0x04*/
+	__vo uin32_t CCR;					/* Give a short description, address offset:0x04*/
+	__vo uin32_t TRISE;					/* Give a short description, address offset:0x04*/
+	__vo uin32_t FLTR;					/* Give a short description, address offset:0x04*/
 }I2C_RegDef_t;
 
 /*
