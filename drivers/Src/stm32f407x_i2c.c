@@ -189,6 +189,8 @@ void I2C_Init(I2C_Handle_t *pI2CHandle)
 
 	//5. Configure the rise time for I2C pins (will discuss later)
 
+	// CCR calculations
+
 
 }
 
@@ -208,65 +210,5 @@ void I2C_Init(I2C_Handle_t *pI2CHandle)
  *************************************************************************************************/
 void I2C_Deinit(I2C_RegDef_t *pI2Cx)
 {
-	
 
-}
-
-uint8_t I2C_GetFlagStatus(I2C_RegDef_t *pI2Cx , uint32_t FlagName)
-{
-	if((pI2Cx->SR1 & FlagName) || (pI2Cx->SR2 & FlagName))
-	{
-		return FLAG_SET;
-	}
-	return FLAG_RESET;
-}
-
-/*
- * I2C send and receive data
- */
-
-void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *TxBuffer, uint8_t len, uint8_t SlaveAddr)
-{
-	uint32_t temp;
-	// 1. Generate the start condition
-	pI2CHandle->pI2Cx->CR1 |= (1 << I2C_CR1_START);
-
-	// 2. Check if the start bit is set and then Read the SR1 register to clear the start bit
-	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,I2C_SR1_SB) == FLAG_SET));
-	//uint32_t temp = pI2CHandle->pI2Cx->SR1; 
-
-	// 3. Send the address of slave with transmission byte (0)
-	SlaveAddr = SlaveAddr << 1;
-	SlaveAddr &= ~(1);
-	pI2CHandle->pI2Cx->DR = SlaveAddr; 
-
-	// 4. ADDR bit is set if it receives an ACK
-	if(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_SR1_ADDR)) == FLAG_SET)
-	{
-		// The ADDR bit is set which means that the master received an ack. Now we should reset this ADDR bit
-		// read SR1 and SR2 to clear this bit
-		temp = pI2CHandle->pI2Cx->SR1;
-		temp = pI2CHandle->pI2Cx->SR2;
-		(void)temp;
-	}
-
-	// 5. Send data till len becomes zero. We don't have to check for ack every time as it is handled by the hardware
-	while(len)
-	{
-		// wait till Txe is 1 indicating that DR is empty and ready to be filled with data
-		while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_SR1_TxE))))
-		{
-			pI2CHandle->pI2Cx->DR = *TxBuffer;
-			TxBuffer++;
-			len--;
-		}
-	}
-
-	// 6. Close the communication
-	// 6.1 wait for Txe = 1 and BTF = 1 before generating the stop condition
-	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_SR1_TxE))));
-	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_SR1_BTF))));
-
-	// 6.2 Generate the stop condition
-	pI2CHandle->pI2Cx->CR1 |= (1 << I2C_CR1_STOP);
 }
