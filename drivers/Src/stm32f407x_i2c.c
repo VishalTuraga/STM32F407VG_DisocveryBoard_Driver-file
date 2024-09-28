@@ -71,8 +71,8 @@ void I2C_ClockControl(I2C_RegDef_t *pI2Cx, uint8_t EnorDi)
 	}
 }
 
-uint16_t AHB1PreArr = {2,4,8,16,32,64,128,256,512};
-uint16_t APB1PreArr = {2,4,8,16};
+uint16_t AHB1PreArr[9] = {2,4,8,16,32,64,128,256,512};
+uint16_t APB1PreArr[4] = {2,4,8,16};
 
 uint32_t RCC_GetPCLK1Value(void)
 {
