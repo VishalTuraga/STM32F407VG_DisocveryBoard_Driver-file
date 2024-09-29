@@ -205,6 +205,8 @@ void I2C_Init(I2C_Handle_t *pI2CHandle)
 
 	pI2CHandle->pI2Cx->TRISE = (tempreg & 0x3F);
 
+	// CCR calculations
+
 
 }
 
@@ -390,5 +392,7 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *RxBuffer, uint8_t 
 	// 7. Renable acking
 	if(pI2CHandle->I2C_Config.I2C_ACKControl == I2C_ACKCTRL_ACK_EN)
 		pI2CHandle->pI2Cx->CR1 |= (1 << I2C_CR1_ACK);
+
+}
 
 }

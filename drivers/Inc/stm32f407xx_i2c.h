@@ -77,8 +77,10 @@ void I2C_Deinit(I2C_RegDef_t *pI2Cx);
 /*
  * I2C Data receive and Send
  */
+
 void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *TxBuffer, uint8_t len, uint8_t SlaveAddr);
 void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *RxBuffer, uint8_t len, uint8_t SlaveAddr);
+
 
 /*
  * IRQ configuration and ISR Handling
