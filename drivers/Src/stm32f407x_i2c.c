@@ -37,6 +37,18 @@ void I2C_PeripheralControl(I2C_RegDef_t *pI2Cx, uint8_t EnOrDi)
 	}
 }
 
+void I2C_ManageAcking(I2C_RegDef_t *pI2Cx, uint8_t EnOrDi)
+{
+	if(EnOrDi == ENABLE)
+	{
+		pI2Cx->CR1 |= (1 << I2C_CR1_ACK);
+	}
+	else if(EnOrDi == DISABLE)
+	{
+		pI2Cx->CR1 |= (1 << I2C_CR1_ACK);
+	}
+}
+
 void I2C_ClockControl(I2C_RegDef_t *pI2Cx, uint8_t EnorDi)
 {
 	if(EnorDi == ENABLE)
@@ -253,7 +265,7 @@ uint8_t I2C_GetFlagStatus(I2C_RegDef_t *pI2Cx , uint32_t FlagName)
  * I2C send and receive data
  */
 
-void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *TxBuffer, uint8_t len, uint8_t SlaveAddr)
+void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *TxBuffer, uint8_t len, uint8_t SlaveAddr, uint8_t Sr)
 {
 	uint32_t temp;
 	// 1. Generate the start condition
@@ -295,8 +307,9 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *TxBuffer, uint8_t len
 	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_SR1_TxE))));
 	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_SR1_BTF))));
 
-	// 6.2 Generate the stop condition
-	pI2CHandle->pI2Cx->CR1 |= (1 << I2C_CR1_STOP);
+	// 6.2 Generate the stop condition (if repeated start isn't enabled)
+	if(Sr == I2C_NO_SR)
+		pI2CHandle->pI2Cx->CR1 |= (1 << I2C_CR1_STOP);
 }
 
 /*************************************************************************************************
@@ -318,14 +331,14 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *TxBuffer, uint8_t len
  * I2C send and receive data
  */
 
-void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *RxBuffer, uint8_t len, uint8_t SlaveAddr)
+void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *RxBuffer, uint8_t len, uint8_t SlaveAddr, uint8_t Sr)
 {
 	uint32_t temp;
 	// 1. Initiate the start condition
 	pI2CHandle->pI2Cx->CR1 |= (1 << I2C_CR1_START);
 
 	// 2. Confirm if the start bit is set
-	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,I2C_SR1_SB) == FLAG_SET));
+	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,I2C_SR1_SB)));
 
 	// 3. Send Address bit
 	SlaveAddr = SlaveAddr << 1;
@@ -349,16 +362,16 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *RxBuffer, uint8_t 
 		// d. wait till RXNE is set
 		while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, (1 << I2C_SR1_RxNE)));
 
-		// b. send stop condition
-		pI2CHandle->pI2Cx->CR1 |= (1 << I2C_CR1_STOP);
+		// b. send stop condition if repeated start is disabled
+		if(Sr == I2C_NO_SR)
+			pI2CHandle->pI2Cx->CR1 |= (1 << I2C_CR1_STOP);
 
 		// e. Read the data from the data register
 		*RxBuffer = pI2CHandle->pI2Cx->DR;
 		RxBuffer++;
 		len--;
-
 	}
-	if(len > 0)
+	if(len > 1 )
 	{
 		// a. clear the address bit
 		temp = pI2CHandle->pI2Cx->SR1;
@@ -377,8 +390,9 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *RxBuffer, uint8_t 
 				// c.1 clear ACK
 				pI2CHandle->pI2Cx->CR1 &= ~(1 << I2C_CR1_ACK);
 
-				// c.2 set STOP condition
-				pI2CHandle->pI2Cx->CR1 |= (1 << I2C_CR1_STOP);
+				// c.2 set STOP condition if repeated start is disabled
+				if(Sr == I2C_NO_SR)
+					pI2CHandle->pI2Cx->CR1 |= (1 << I2C_CR1_STOP);
 			}
 
 			*RxBuffer = pI2CHandle->pI2Cx->DR;
@@ -392,7 +406,5 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *RxBuffer, uint8_t 
 	// 7. Renable acking
 	if(pI2CHandle->I2C_Config.I2C_ACKControl == I2C_ACKCTRL_ACK_EN)
 		pI2CHandle->pI2Cx->CR1 |= (1 << I2C_CR1_ACK);
-
-}
 
 }

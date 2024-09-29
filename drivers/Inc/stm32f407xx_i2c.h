@@ -27,6 +27,9 @@ typedef struct
 	I2C_RegDef_t *pI2Cx;
 }I2C_Handle_t ;
 
+#define I2C_NO_SR			 	RESET
+#define I2C_SR					SET
+
 /*
  * @I2C_SCLSpeed
  */
@@ -47,6 +50,8 @@ typedef struct
  */
 #define I2C_DUTYCYCLE_2			0
 #define I2C_DUTYCYCLE_16_9		1
+
+
 
 /**************************************************************************************************************************************
  * 														APIs supported by this driver
@@ -78,8 +83,8 @@ void I2C_Deinit(I2C_RegDef_t *pI2Cx);
  * I2C Data receive and Send
  */
 
-void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *TxBuffer, uint8_t len, uint8_t SlaveAddr);
-void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *RxBuffer, uint8_t len, uint8_t SlaveAddr);
+void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *TxBuffer, uint8_t len, uint8_t SlaveAddr, uint8_t Sr);
+void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *RxBuffer, uint8_t len, uint8_t SlaveAddr, uint8_t Sr);
 
 
 /*
