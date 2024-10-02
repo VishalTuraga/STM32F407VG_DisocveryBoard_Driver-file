@@ -23,12 +23,27 @@ typedef struct
 
 typedef struct
 {
-	I2C_Config_t I2C_Config;
-	I2C_RegDef_t *pI2Cx;
+	I2C_Config_t 	I2C_Config;
+	I2C_RegDef_t 	*pI2Cx;
+	uint8_t			*pTxBuffer; 	/* To store the application Tx buffer address */
+	uint8_t			*pRxBuffer		/* To store the application Rx buffer address */
+	uint32_t		TxLen;			/* To store the application Tx Len*/
+	uint32_t		RxLen;			/* To store the application Rx Len*/
+	uint8_t			TxRxState;		/* To store the Communication state*/
+	uint8_t			DevAddr;		/* To store the slave/device address*/
+	uint32_t 		RxSize;			/* To store the Rx size*/
+	uint8_t			Sr;				/*To store repeated start value*/
 }I2C_Handle_t ;
 
 #define I2C_NO_SR			 	RESET
 #define I2C_SR					SET
+
+/*
+ * I2C Application states
+ */
+#define I2C_READY				0
+#define I2C_BUSY_IN_RX			1
+#define I2C_BUSY_IN_TX			2
 
 /*
  * @I2C_SCLSpeed
