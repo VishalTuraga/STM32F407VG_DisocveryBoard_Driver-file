@@ -37,6 +37,20 @@ void I2C_PeripheralControl(I2C_RegDef_t *pI2Cx, uint8_t EnOrDi)
 	}
 }
 
+/*************************************************************************************************
+ * @fn				- I2C_ManageAcking
+ *
+ * @brief			-
+ *
+ * @param[in]		-
+ * @param[in]		-
+ * @param[in[		-
+ *
+ * @return			-
+ *
+ * @Note			-
+ *
+ *************************************************************************************************/
 void I2C_ManageAcking(I2C_RegDef_t *pI2Cx, uint8_t EnOrDi)
 {
 	if(EnOrDi == ENABLE)
@@ -49,6 +63,20 @@ void I2C_ManageAcking(I2C_RegDef_t *pI2Cx, uint8_t EnOrDi)
 	}
 }
 
+/*************************************************************************************************
+ * @fn				- I2C_ClockControl
+ *
+ * @brief			-
+ *
+ * @param[in]		-
+ * @param[in]		-
+ * @param[in[		-
+ *
+ * @return			-
+ *
+ * @Note			-
+ *
+ *************************************************************************************************/
 void I2C_ClockControl(I2C_RegDef_t *pI2Cx, uint8_t EnorDi)
 {
 	if(EnorDi == ENABLE)
@@ -86,6 +114,20 @@ void I2C_ClockControl(I2C_RegDef_t *pI2Cx, uint8_t EnorDi)
 uint16_t AHB1PreArr[9] = {2,4,8,16,32,64,128,256,512};
 uint16_t APB1PreArr[4] = {2,4,8,16};
 
+/*************************************************************************************************
+ * @fn				- RCC_GetPCLK1Value
+ *
+ * @brief			-
+ *
+ * @param[in]		-
+ * @param[in]		-
+ * @param[in[		-
+ *
+ * @return			-
+ *
+ * @Note			-
+ *
+ *************************************************************************************************/
 uint32_t RCC_GetPCLK1Value(void)
 {
 	uint32_t pclk1;
@@ -252,6 +294,20 @@ void I2C_Deinit(I2C_RegDef_t *pI2Cx)
 	}
 }
 
+/*************************************************************************************************
+ * @fn				- I2C_GetFlagStatus
+ *
+ * @brief			-
+ *
+ * @param[in]		-
+ * @param[in]		-
+ * @param[in[		-
+ *
+ * @return			-
+ *
+ * @Note			-
+ *
+ *************************************************************************************************/
 uint8_t I2C_GetFlagStatus(I2C_RegDef_t *pI2Cx , uint32_t FlagName)
 {
 	if((pI2Cx->SR1 & FlagName) || (pI2Cx->SR2 & FlagName))
@@ -265,6 +321,20 @@ uint8_t I2C_GetFlagStatus(I2C_RegDef_t *pI2Cx , uint32_t FlagName)
  * I2C send and receive data
  */
 
+/*************************************************************************************************
+ * @fn				- I2C_MasterSendData
+ *
+ * @brief			-
+ *
+ * @param[in]		-
+ * @param[in]		-
+ * @param[in[		-
+ *
+ * @return			-
+ *
+ * @Note			-
+ *
+ *************************************************************************************************/
 void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *TxBuffer, uint8_t len, uint8_t SlaveAddr, uint8_t Sr)
 {
 	uint32_t temp;
@@ -313,7 +383,7 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *TxBuffer, uint8_t len
 }
 
 /*************************************************************************************************
- * @fn				- I2C_Deinit
+ * @fn				- I2C_MasterReceiveData
  *
  * @brief			-
  *
@@ -407,4 +477,168 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *RxBuffer, uint8_t 
 	if(pI2CHandle->I2C_Config.I2C_ACKControl == I2C_ACKCTRL_ACK_EN)
 		pI2CHandle->pI2Cx->CR1 |= (1 << I2C_CR1_ACK);
 
+}
+
+/*************************************************************************************************
+ * @fn				- I2C_MasterSendDataIT
+ *
+ * @brief			-
+ *
+ * @param[in]		-
+ * @param[in]		-
+ * @param[in[		-
+ *
+ * @return			-
+ *
+ * @Note			-
+ *
+ *************************************************************************************************/
+uint8_t I2C_MasterSendDataIT(I2C_Handle_t *pI2CHandle, uint8_t *TxBuffer, uint8_t len, uint8_t SlaveAddr, uint8_t Sr)
+{
+	uint8_t busystate = pI2CHandle->TxRxState;
+
+	if( (busystate != I2C_BUSY_IN_TX) && (busystate != I2C_BUSY_IN_RX))
+	{
+		pI2CHandle->pTxBuffer =TxBuffer;
+		pI2CHandle->TxLen = len;
+		pI2CHandle->TxRxState = I2C_BUSY_IN_TX;
+		pI2CHandle->DevAddr = SlaveAddr;
+		pI2CHandle->Sr = Sr;
+
+		//Implement code to Generate START Condition
+		pI2CHandle->pI2Cx->CR1 |= ( 1 << I2C_CR1_START);
+
+		//Implement the code to enable ITBUFEN Control Bit
+		pI2CHandle->pI2Cx->CR2 |= ( 1 << I2C_CR2_ITBUFEN);
+
+		//Implement the code to enable ITEVFEN Control Bit
+		pI2CHandle->pI2Cx->CR2 |= ( 1 << I2C_CR2_ITEVTEN);
+
+
+		//Implement the code to enable ITERREN Control Bit
+		pI2CHandle->pI2Cx->CR2 |= ( 1 << I2C_CR2_ITERREN);
+	}
+	return busystate;
+}
+
+/*************************************************************************************************
+ * @fn				- I2C_MasterReceiveDataIT
+ *
+ * @brief			-
+ *
+ * @param[in]		-
+ * @param[in]		-
+ * @param[in[		-
+ *
+ * @return			-
+ *
+ * @Note			-
+ *
+ *************************************************************************************************/
+uint8_t I2C_MasterReceiveDataIT(I2C_Handle_t *pI2CHandle, uint8_t *RxBuffer, uint8_t len, uint8_t SlaveAddr, uint8_t Sr)
+{
+	uint8_t busystate = pI2CHandle->TxRxState;
+
+	if( (busystate != I2C_BUSY_IN_TX) && (busystate != I2C_BUSY_IN_RX))
+	{
+		pI2CHandle->pRxBuffer = RxBuffer;
+		pI2CHandle->RxLen = len;
+		pI2CHandle->TxRxState = I2C_BUSY_IN_RX;
+		pI2CHandle->RxSize = len; //Rxsize is used in the ISR code to manage the data reception
+		pI2CHandle->DevAddr = SlaveAddr;
+		pI2CHandle->Sr = Sr;
+
+		//Implement code to Generate START Condition
+		pI2CHandle->pI2Cx->CR1 |= ( 1 << I2C_CR1_START);
+
+		//Implement the code to enable ITBUFEN Control Bit
+		pI2CHandle->pI2Cx->CR2 |= ( 1 << I2C_CR2_ITBUFEN);
+
+		//Implement the code to enable ITEVFEN Control Bit
+		pI2CHandle->pI2Cx->CR2 |= ( 1 << I2C_CR2_ITEVTEN);
+
+
+		//Implement the code to enable ITERREN Control Bit
+		pI2CHandle->pI2Cx->CR2 |= ( 1 << I2C_CR2_ITERREN);
+
+	}
+
+	return busystate;
+
+}
+
+/*************************************************************************************************
+ * @fn				- I2C_IRQInterruptConfig
+ *
+ * @brief			-
+ *
+ * @param[in]		-
+ * @param[in]		-
+ * @param[in[		-
+ *
+ * @return			-
+ *
+ * @Note			-
+ *
+ *************************************************************************************************/
+void I2C_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi)
+{
+	// processor side configuration
+	if(EnorDi == ENABLE)
+	{
+		if(IRQNumber <= 31)
+		{
+			// program ISER1
+			*NVIC_ISER0 |= (1<<IRQNumber);
+		}
+		else if (IRQNumber >= 32 && IRQNumber <=63)
+		{
+			*NVIC_ISER1 |= (1<<(IRQNumber%32));
+		}
+		else if (IRQNumber >= 64 && IRQNumber <= 96)
+		{
+			*NVIC_ISER2 |= (1<<(IRQNumber%64));
+		}
+	}
+	else
+	{
+		if(IRQNumber <= 31)
+		{
+			// program ISER1
+			*NVIC_ICER0 |= (1<<IRQNumber);
+		}
+		else if (IRQNumber >= 32 && IRQNumber <=63)
+		{
+			*NVIC_ICER1 |= (1<<(IRQNumber%32));
+		}
+		else if (IRQNumber >= 64 && IRQNumber <= 96)
+		{
+			*NVIC_ICER2 |= (1<<(IRQNumber%64));
+		}
+	}
+
+}
+
+/*************************************************************************************************
+ * @fn				- I2C_IRQPriorityConfig
+ *
+ * @brief			-
+ *
+ * @param[in]		-
+ * @param[in]		-
+ * @param[in[		-
+ *
+ * @return			-
+ *
+ * @Note			-
+ *
+ *************************************************************************************************/
+void I2C_IRQPriorityConfig(uint8_t IRQNumber, uint32_t IRQPriority)
+{
+	// NOTE: Only the first 4 bits (starting from MSB) are implemented in each of the 8 bits assigned.
+	uint8_t iprx 			= IRQNumber/4;
+	uint8_t iprx_section 	= IRQNumber%4;
+	uint8_t shift_amount	= (8 * iprx_section) + (8 - NO_PR_BITS_IMPLEMENTED);
+
+	*(NVIC_IPR_BASEADDR + (iprx))	|= (IRQPriority << shift_amount);
 }

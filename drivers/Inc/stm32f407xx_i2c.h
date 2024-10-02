@@ -26,7 +26,7 @@ typedef struct
 	I2C_Config_t 	I2C_Config;
 	I2C_RegDef_t 	*pI2Cx;
 	uint8_t			*pTxBuffer; 	/* To store the application Tx buffer address */
-	uint8_t			*pRxBuffer		/* To store the application Rx buffer address */
+	uint8_t			*pRxBuffer;		/* To store the application Rx buffer address */
 	uint32_t		TxLen;			/* To store the application Tx Len*/
 	uint32_t		RxLen;			/* To store the application Rx Len*/
 	uint8_t			TxRxState;		/* To store the Communication state*/
@@ -101,6 +101,11 @@ void I2C_Deinit(I2C_RegDef_t *pI2Cx);
 void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *TxBuffer, uint8_t len, uint8_t SlaveAddr, uint8_t Sr);
 void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *RxBuffer, uint8_t len, uint8_t SlaveAddr, uint8_t Sr);
 
+/*
+ * I2C Data receive and Send with Interrupt Functionality
+ */
+uint8_t I2C_MasterSendDataIT(I2C_Handle_t *pI2CHandle, uint8_t *TxBuffer, uint8_t len, uint8_t SlaveAddr, uint8_t Sr);
+uint8_t I2C_MasterReceiveDataIT(I2C_Handle_t *pI2CHandle, uint8_t *RxBuffer, uint8_t len, uint8_t SlaveAddr, uint8_t Sr);
 
 /*
  * IRQ configuration and ISR Handling
