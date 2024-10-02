@@ -19,4 +19,6 @@
 ../drivers/Src/stm32f407x_i2c.c:761:6:I2C_CloseSendData	16	static
 ../drivers/Src/stm32f407x_i2c.c:773:6:I2C_CloseReceiveData	16	static
 ../drivers/Src/stm32f407x_i2c.c:802:6:I2C_EV_IRQHandling	32	static
-../drivers/Src/stm32f407x_i2c.c:932:6:I2C_ER_IRQHandling	24	static
+../drivers/Src/stm32f407x_i2c.c:944:6:I2C_ER_IRQHandling	24	static
+../drivers/Src/stm32f407x_i2c.c:1034:6:I2C_SlaveSendData	16	static
+../drivers/Src/stm32f407x_i2c.c:1053:9:I2C_SlaveReceiveData	16	static
