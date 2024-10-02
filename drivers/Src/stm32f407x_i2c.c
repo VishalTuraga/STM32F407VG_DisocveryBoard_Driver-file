@@ -1004,3 +1004,41 @@ void I2C_ER_IRQHandling(I2C_Handle_t *pI2CHandle)
 	}
 
 }
+
+/*************************************************************************************************
+ * @fn				- I2C_SlaveSendData
+ *
+ * @brief			-
+ *
+ * @param[in]		-
+ * @param[in]		-
+ * @param[in[		-
+ *
+ * @return			-
+ *
+ * @Note			-
+ *
+ *************************************************************************************************/
+void I2C_SlaveSendData(I2C_RegDef_t *pI2Cx, uint8_t data)
+{
+	pI2Cx->DR = data;
+}
+
+/*************************************************************************************************
+ * @fn				- I2C_SlaveReceiveData
+ *
+ * @brief			-
+ *
+ * @param[in]		-
+ * @param[in]		-
+ * @param[in[		-
+ *
+ * @return			-
+ *
+ * @Note			-
+ *
+ *************************************************************************************************/
+uint8_t I2C_SlaveReceiveData(I2C_RegDef_t *pI2Cx)
+{
+	return (uint8_t)pI2Cx->DR;
+}
