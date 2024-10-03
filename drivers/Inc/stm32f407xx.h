@@ -191,6 +191,27 @@
 
 /******************************************peripheral register definition structures****************************************************/
 /*
+ * USART peripheral register structure
+ */
+typedef struct
+{
+	__vo uint32_t SR;					/* Give a short description, address offset:0x04*/
+	__vo uint32_t DR;					/* Give a short description, address offset:0x04*/
+	__vo uint32_t BRR;					/* Give a short description, address offset:0x04*/
+	__vo uint32_t CR1;					/* Give a short description, address offset:0x04*/
+	__vo uint32_t CR2;					/* Give a short description, address offset:0x04*/
+	__vo uint32_t CR3;					/* Give a short description, address offset:0x04*/
+	__vo uint32_t GTPR;					/* Give a short description, address offset:0x04*/
+}USART_RegDeg_t;
+
+#define USART1							((USART_RegDef_t*)USART1_BASEADDR)
+#define USART2							((USART_RegDef_t*)USART2_BASEADDR)
+#define USART3							((USART_RegDef_t*)USART3_BASEADDR)
+#define UART4							((USART_RegDef_t*)UART4_BASEADDR)
+#define UART5							((USART_RegDef_t*)UART5_BASEADDR)
+#define USART6							((USART_RegDef_t*)USART6_BASEADDR)
+
+/*
  * I2C peripheral register structure
  */
 
