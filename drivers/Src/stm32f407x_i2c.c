@@ -347,15 +347,18 @@ void I2C_Deinit(I2C_RegDef_t *pI2Cx)
 {
 	if(pI2Cx == I2C1)
 	{
-		I2C1_CLK_DI();
+		RCC->APB1RSTR |= (1 << 21);
+		RCC->APB1RSTR &= ~(1 << 21);
 	}
-	else if (pI2Cx == I2C2)
+	else if(pI2Cx == I2C2)
 	{
-		I2C2_CLK_DI();
+		RCC->APB1RSTR |= (1 << 22);
+		RCC->APB1RSTR &= ~(1 << 22);
 	}
-	else if (pI2Cx == I2C3)
+	else if(pI2Cx == I2C3)
 	{
-		I2C3_CLK_DI();
+		RCC->APB1RSTR |= (1 << 23);
+		RCC->APB1RSTR &= ~(1 << 23);
 	}
 }
 

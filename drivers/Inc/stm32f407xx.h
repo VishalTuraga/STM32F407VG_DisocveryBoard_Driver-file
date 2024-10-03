@@ -202,7 +202,7 @@ typedef struct
 	__vo uint32_t CR2;					/* Give a short description, address offset:0x04*/
 	__vo uint32_t CR3;					/* Give a short description, address offset:0x04*/
 	__vo uint32_t GTPR;					/* Give a short description, address offset:0x04*/
-}USART_RegDeg_t;
+}USART_RegDef_t;
 
 #define USART1							((USART_RegDef_t*)USART1_BASEADDR)
 #define USART2							((USART_RegDef_t*)USART2_BASEADDR)
@@ -420,15 +420,15 @@ typedef struct
 /*
  * Disable clock macros for GPIOx peripherals
  */
-#define GPIOA_CLK_DI()					(RCC->AHB1ENR |= (1<<0))
-#define GPIOB_CLK_DI()					(RCC->AHB1ENR |= (1<<1))
-#define GPIOC_CLK_DI()					(RCC->AHB1ENR |= (1<<2))
-#define GPIOD_CLK_DI()					(RCC->AHB1ENR |= (1<<3))
-#define GPIOE_CLK_DI()					(RCC->AHB1ENR |= (1<<4))
-#define GPIOF_CLK_DI()					(RCC->AHB1ENR |= (1<<5))
-#define GPIOG_CLK_DI()					(RCC->AHB1ENR |= (1<<6))
-#define GPIOH_CLK_DI()					(RCC->AHB1ENR |= (1<<7))
-#define GPIOI_CLK_DI()					(RCC->AHB1ENR |= (1<<8))
+#define GPIOA_CLK_DI()					(RCC->AHB1ENR &= ~(1<<0))
+#define GPIOB_CLK_DI()					(RCC->AHB1ENR &= ~(1<<1))
+#define GPIOC_CLK_DI()					(RCC->AHB1ENR &= ~(1<<2))
+#define GPIOD_CLK_DI()					(RCC->AHB1ENR &= ~(1<<3))
+#define GPIOE_CLK_DI()					(RCC->AHB1ENR &= ~(1<<4))
+#define GPIOF_CLK_DI()					(RCC->AHB1ENR &= ~(1<<5))
+#define GPIOG_CLK_DI()					(RCC->AHB1ENR &= ~(1<<6))
+#define GPIOH_CLK_DI()					(RCC->AHB1ENR &= ~(1<<7))
+#define GPIOI_CLK_DI()					(RCC->AHB1ENR &= ~(1<<8))
 
 /*
  * Disable clock macros for I2Cx peripherals
@@ -766,5 +766,6 @@ typedef struct
 #include "stm32f407xx_gpio.h"
 #include "stm32f407xx_spi.h"
 #include "stm32f407xx_i2c.h"
+#include "stm32f407x_usart.h"
 
 #endif /* INC_STM32F407XX_H_ */

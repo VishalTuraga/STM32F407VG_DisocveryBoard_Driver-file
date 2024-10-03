@@ -5,3 +5,4 @@
 "./drivers/Src/stm32f407x_i2c.o"
 "./drivers/Src/stm32f407xx_gpio_driver.o"
 "./drivers/Src/stm32f407xx_spi.o"
+"./drivers/Src/stm32f407xx_usart.o"
