@@ -25,6 +25,12 @@ typedef struct
 
 
 /*
+ * USART Flags
+ */
+#define USART_FLAG_TXE						(1 << 7)
+#define USART_FLAG_TC						(1 << 6)
+
+/*
  *@USART_Mode
  *Possible options for USART_Mode
  */
