@@ -365,10 +365,10 @@ void USART_SendData(USART_Handle_t *pUSARTHandle, uint8_t *pTxBuffer, uint32_t L
 void USART_ReceiveData(USART_Handle_t *pUSARTHandle, uint8_t *pRxBuffer, uint32_t Len)
 {
    //Loop over until "Len" number of bytes are transferred
-	for(uint32_t i = 0 ; i < TODO; i++)
+	for(uint32_t i = 0 ; i < Len; i++)
 	{
 		//Implement the code to wait until RXNE flag is set in the SR
-		TODO
+		while(!USART_GetFlagStatus(pUSARTHandle->pUSARTx, USART_FLAG_RXNE));
 
 		//Check the USART_WordLength to decide whether we are going to receive 9bit of data in a frame or 8 bit
 		if(pUSARTHandle->USART_Config.USART_WordLength == USART_WORDLEN_9BITS)
@@ -376,15 +376,16 @@ void USART_ReceiveData(USART_Handle_t *pUSARTHandle, uint8_t *pRxBuffer, uint32_
 			//We are going to receive 9bit data in a frame
 
 			//check are we using USART_ParityControl control or not
-			if(pUSARTHandle->USART_Config.USART_ParityControl == TODO)
+			if(pUSARTHandle->USART_Config.USART_ParityControl == USART_PARITY_DISABLE)
 			{
 				//No parity is used. so, all 9bits will be of user data
 
 				//read only first 9 bits. so, mask the DR with 0x01FF
-				*((uint16_t*) pRxBuffer) = (pUSARTHandle->pUSARTx->DR  & (uint16_t)TODO);
+				*((uint16_t*) pRxBuffer) = (pUSARTHandle->pUSARTx->DR  & (uint16_t)0x01FF);
 
 				//Now increment the pRxBuffer two times
-				TODO
+				pRxBuffer++;
+				pRxBuffer++;
 			}
 			else
 			{
@@ -392,7 +393,7 @@ void USART_ReceiveData(USART_Handle_t *pUSARTHandle, uint8_t *pRxBuffer, uint32_
 				 *pRxBuffer = (pUSARTHandle->pUSARTx->DR  & (uint8_t)0xFF);
 
 				 //Increment the pRxBuffer
-				TODO
+				 pRxBuffer++;
 			}
 		}
 		else
@@ -405,7 +406,7 @@ void USART_ReceiveData(USART_Handle_t *pUSARTHandle, uint8_t *pRxBuffer, uint32_
 				//No parity is used , so all 8bits will be of user data
 
 				//read 8 bits from DR
-				 *pRxBuffer = TODO;
+				 *pRxBuffer = (uint8_t)(pUSARTHandle->pUSARTx->DR & (uint8_t)0xFF);
 			}
 
 			else
@@ -413,7 +414,7 @@ void USART_ReceiveData(USART_Handle_t *pUSARTHandle, uint8_t *pRxBuffer, uint32_
 				//Parity is used, so , 7 bits will be of user data and 1 bit is parity
 
 				//read only 7 bits , hence mask the DR with 0X7F
-				 *pRxBuffer = (uint8_t) TODO
+				 *pRxBuffer = (uint8_t)(pUSARTHandle->pUSARTx->DR & (uint8_t)0x7F);
 
 			}
 
@@ -593,6 +594,7 @@ void USART_PeripheralControl(USART_RegDef_t *pUSARTx, uint8_t EnOrDi)
  *
  *************************************************************************************************/
 void USART_ApplicationEventCallback(USART_Handle_t *pUSARTHandle,uint8_t AppEv){}
+
 
 
 
