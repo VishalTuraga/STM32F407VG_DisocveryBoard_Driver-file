@@ -7,64 +7,6 @@
 
 #include "stm32f407x_usart.h"
 
-/*
- *@USART_Mode
- *Possible options for USART_Mode
- */
-#define USART_MODE_ONLY_TX					0
-#define USART_MODE_ONLY_RX 					1
-#define USART_MODE_TXRX  					2
-
-/*
- *@USART_Baud
- *Possible options for USART_Baud
- */
-#define USART_STD_BAUD_1200					1200
-#define USART_STD_BAUD_2400					400
-#define USART_STD_BAUD_9600					9600
-#define USART_STD_BAUD_19200 				19200
-#define USART_STD_BAUD_38400 				38400
-#define USART_STD_BAUD_57600 				57600
-#define USART_STD_BAUD_115200 				115200
-#define USART_STD_BAUD_230400 				230400
-#define USART_STD_BAUD_460800 				460800
-#define USART_STD_BAUD_921600 				921600
-#define USART_STD_BAUD_2M 					2000000
-#define SUART_STD_BAUD_3M 					3000000
-
-
-/*
- *@USART_ParityControl
- *Possible options for USART_ParityControl
- */
-#define USART_PARITY_EN_ODD					2
-#define USART_PARITY_EN_EVEN				1
-#define USART_PARITY_DISABLE				0
-
-/*
- *@USART_WordLength
- *Possible options for USART_WordLength
- */
-#define USART_WORDLEN_8BITS					0
-#define USART_WORDLEN_9BITS					1
-
-/*
- *@USART_NoOfStopBits
- *Possible options for USART_NoOfStopBits
- */
-#define USART_STOPBITS_1					0
-#define USART_STOPBITS_0_5					1
-#define USART_STOPBITS_2					2
-#define USART_STOPBITS_1_5					3
-
-/*
- *@USART_HWFlowControl
- *Possible options for USART_HWFlowControl
- */
-#define USART_HW_FLOW_CTRL_NONE		    	0
-#define USART_HW_FLOW_CTRL_CTS		    	1
-#define USART_HW_FLOW_CTRL_RTS		    	2
-#define USART_HW_FLOW_CTRL_CTS_RTS			3
 
 
 /*************************************************************************************************
@@ -203,6 +145,88 @@ void USART_PeriClockControl(USART_RegDef_t *pUSARTx, uint8_t EnorDi)
  *************************************************************************************************/
 void USART_Init(USART_Handle_t *pUSARTHandle)
 {
+
+	//Temporary variable
+	uint32_t tempreg=0;
+
+	//Enable USART Tx and Rx engines according to the USART_Mode configuration item
+	if ( pUSARTHandle->USART_Config.USART_Mode == USART_MODE_ONLY_RX)
+	{
+		//Implement the code to enable the Receiver bit field
+		tempreg|= (1 << USART_CR1_RE);
+	}else if (pUSARTHandle->USART_Config.USART_Mode == USART_MODE_ONLY_TX)
+	{
+		//Implement the code to enable the Transmitter bit field
+		tempreg |= ( 1 << USART_CR1_TE);
+
+	}else if (pUSARTHandle->USART_Config.USART_Mode == USART_MODE_TXRX)
+	{
+		//Implement the code to enable the both Transmitter and Receiver bit fields
+		tempreg |= ( ( 1 << USART_CR1_RE) | ( 1 << USART_CR1_TE) );
+	}
+
+    //Implement the code to configure the Word length configuration item
+	tempreg |= pUSARTHandle->USART_Config.USART_WordLength << USART_CR1_M ;
+
+
+    //Configuration of parity control bit fields
+	if ( pUSARTHandle->USART_Config.USART_ParityControl == USART_PARITY_EN_EVEN)
+	{
+		//Implement the code to enable the parity control
+		tempreg |= ( 1 << USART_CR1_PCE);
+
+		//Implement the code to enable EVEN parity
+		//Not required because by default EVEN parity will be selected once you enable the parity control
+
+	}else if (pUSARTHandle->USART_Config.USART_ParityControl == USART_PARITY_EN_ODD )
+	{
+		//Implement the code to enable the parity control
+	    tempreg |= ( 1 << USART_CR1_PCE);
+
+	    //Implement the code to enable ODD parity
+	    tempreg |= ( 1 << USART_CR1_PS);
+
+	}
+
+   //Program the CR1 register
+	pUSARTHandle->pUSARTx->CR1 = tempreg;
+
+/******************************** Configuration of CR2******************************************/
+
+	tempreg=0;
+
+	//Implement the code to configure the number of stop bits inserted during USART frame transmission
+	tempreg |= pUSARTHandle->USART_Config.USART_NoOfStopBits << USART_CR2_STOP;
+
+	//Program the CR2 register
+	pUSARTHandle->pUSARTx->CR2 = tempreg;
+
+/******************************** Configuration of CR3******************************************/
+
+	tempreg=0;
+
+	//Configuration of USART hardware flow control
+	if ( pUSARTHandle->USART_Config.USART_HWFlowControl == USART_HW_FLOW_CTRL_CTS)
+	{
+		//Implement the code to enable CTS flow control
+		tempreg |= ( 1 << USART_CR3_CTSE);
+
+
+	}else if (pUSARTHandle->USART_Config.USART_HWFlowControl == USART_HW_FLOW_CTRL_RTS)
+	{
+		//Implement the code to enable RTS flow control
+		tempreg |= (1 << USART_CR3_RTSE);
+
+	}else if (pUSARTHandle->USART_Config.USART_HWFlowControl == USART_HW_FLOW_CTRL_CTS_RTS)
+	{
+		//Implement the code to enable both CTS and RTS Flow control
+		tempreg |= ((1 << USART_CR3_CTSE)| (1 << USART_CR3_RTSE));
+	}
+
+
+	pUSARTHandle->pUSARTx->CR3 = tempreg;
+
+/******************************** Configuration of BRR(Baudrate register)******************************************/
 
 }
 
