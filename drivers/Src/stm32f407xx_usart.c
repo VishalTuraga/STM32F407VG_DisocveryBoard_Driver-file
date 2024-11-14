@@ -165,11 +165,11 @@ void USART_Init(USART_Handle_t *pUSARTHandle)
 		tempreg |= ( ( 1 << USART_CR1_RE) | ( 1 << USART_CR1_TE) );
 	}
 
-    //Implement the code to configure the Word length configuration item
+	//Implement the code to configure the Word length configuration item
 	tempreg |= pUSARTHandle->USART_Config.USART_WordLength << USART_CR1_M ;
 
 
-    //Configuration of parity control bit fields
+	//Configuration of parity control bit fields
 	if ( pUSARTHandle->USART_Config.USART_ParityControl == USART_PARITY_EN_EVEN)
 	{
 		//Implement the code to enable the parity control
@@ -181,17 +181,17 @@ void USART_Init(USART_Handle_t *pUSARTHandle)
 	}else if (pUSARTHandle->USART_Config.USART_ParityControl == USART_PARITY_EN_ODD )
 	{
 		//Implement the code to enable the parity control
-	    tempreg |= ( 1 << USART_CR1_PCE);
+		tempreg |= ( 1 << USART_CR1_PCE);
 
-	    //Implement the code to enable ODD parity
-	    tempreg |= ( 1 << USART_CR1_PS);
+		//Implement the code to enable ODD parity
+		tempreg |= ( 1 << USART_CR1_PS);
 
 	}
 
-   //Program the CR1 register
+	//Program the CR1 register
 	pUSARTHandle->pUSARTx->CR1 = tempreg;
 
-/******************************** Configuration of CR2******************************************/
+	/******************************** Configuration of CR2******************************************/
 
 	tempreg=0;
 
@@ -201,7 +201,7 @@ void USART_Init(USART_Handle_t *pUSARTHandle)
 	//Program the CR2 register
 	pUSARTHandle->pUSARTx->CR2 = tempreg;
 
-/******************************** Configuration of CR3******************************************/
+	/******************************** Configuration of CR3******************************************/
 
 	tempreg=0;
 
@@ -226,7 +226,7 @@ void USART_Init(USART_Handle_t *pUSARTHandle)
 
 	pUSARTHandle->pUSARTx->CR3 = tempreg;
 
-/******************************** Configuration of BRR(Baudrate register)******************************************/
+	/******************************** Configuration of BRR(Baudrate register)******************************************/
 
 }
 
@@ -295,20 +295,20 @@ void USART_DeInit(USART_RegDef_t *pUSARTx)
  *
  * @return            -
  *
- * @Note              - Resolve all the TODOs
+ * @Note              -
 
  *********************************************************************/
 void USART_SendData(USART_Handle_t *pUSARTHandle, uint8_t *pTxBuffer, uint32_t Len)
 {
 
 	uint16_t *pdata;
-   //Loop over until "Len" number of bytes are transferred
+	//Loop over until "Len" number of bytes are transferred
 	for(uint32_t i = 0 ; i < Len; i++)
 	{
 		//Implement the code to wait until TXE flag is set in the SR
 		while(! USART_GetFlagStatus(pUSARTHandle->pUSARTx,USART_FLAG_TXE));
 
-         //Check the USART_WordLength item for 9BIT or 8BIT in a frame
+		//Check the USART_WordLength item for 9BIT or 8BIT in a frame
 		if(pUSARTHandle->USART_Config.USART_WordLength == USART_WORDLEN_9BITS)
 		{
 			//if 9BIT, load the DR with 2bytes masking the bits other than first 9 bits
@@ -364,7 +364,7 @@ void USART_SendData(USART_Handle_t *pUSARTHandle, uint8_t *pTxBuffer, uint32_t L
 
 void USART_ReceiveData(USART_Handle_t *pUSARTHandle, uint8_t *pRxBuffer, uint32_t Len)
 {
-   //Loop over until "Len" number of bytes are transferred
+	//Loop over until "Len" number of bytes are transferred
 	for(uint32_t i = 0 ; i < Len; i++)
 	{
 		//Implement the code to wait until RXNE flag is set in the SR
@@ -390,10 +390,10 @@ void USART_ReceiveData(USART_Handle_t *pUSARTHandle, uint8_t *pRxBuffer, uint32_
 			else
 			{
 				//Parity is used, so, 8bits will be of user data and 1 bit is parity
-				 *pRxBuffer = (pUSARTHandle->pUSARTx->DR  & (uint8_t)0xFF);
+				*pRxBuffer = (pUSARTHandle->pUSARTx->DR  & (uint8_t)0xFF);
 
-				 //Increment the pRxBuffer
-				 pRxBuffer++;
+				//Increment the pRxBuffer
+				pRxBuffer++;
 			}
 		}
 		else
@@ -406,7 +406,7 @@ void USART_ReceiveData(USART_Handle_t *pUSARTHandle, uint8_t *pRxBuffer, uint32_
 				//No parity is used , so all 8bits will be of user data
 
 				//read 8 bits from DR
-				 *pRxBuffer = (uint8_t)(pUSARTHandle->pUSARTx->DR & (uint8_t)0xFF);
+				*pRxBuffer = (uint8_t)(pUSARTHandle->pUSARTx->DR & (uint8_t)0xFF);
 			}
 
 			else
@@ -414,7 +414,7 @@ void USART_ReceiveData(USART_Handle_t *pUSARTHandle, uint8_t *pRxBuffer, uint32_
 				//Parity is used, so , 7 bits will be of user data and 1 bit is parity
 
 				//read only 7 bits , hence mask the DR with 0X7F
-				 *pRxBuffer = (uint8_t)(pUSARTHandle->pUSARTx->DR & (uint8_t)0x7F);
+				*pRxBuffer = (uint8_t)(pUSARTHandle->pUSARTx->DR & (uint8_t)0x7F);
 
 			}
 
@@ -436,7 +436,7 @@ void USART_ReceiveData(USART_Handle_t *pUSARTHandle, uint8_t *pRxBuffer, uint32_
  *
  * @return            -
  *
- * @Note              - Resolve all the TODOs
+ * @Note              -
 
  */
 uint8_t USART_SendDataIT(USART_Handle_t *pUSARTHandle,uint8_t *pTxBuffer, uint32_t Len)
@@ -475,7 +475,7 @@ uint8_t USART_SendDataIT(USART_Handle_t *pUSARTHandle,uint8_t *pTxBuffer, uint32
  *
  * @return            -
  *
- * @Note              - Resolve all the TODOs
+ * @Note              -
 
  */
 uint8_t USART_ReceiveDataIT(USART_Handle_t *pUSARTHandle,uint8_t *pRxBuffer, uint32_t Len)
@@ -493,6 +493,83 @@ uint8_t USART_ReceiveDataIT(USART_Handle_t *pUSARTHandle,uint8_t *pRxBuffer, uin
 
 	}
 	return rxstate;
+}
+
+/*********************************************************************
+ * @fn      		  - USART_SetBaudRate
+ *
+ * @brief             -
+ *
+ * @param[in]         -
+ * @param[in]         -
+ * @param[in]         -
+ *
+ * @return            -
+ *
+ * @Note              -  Resolve all the TODOs
+
+ */
+void USART_SetBaudRate(USART_RegDef_t *pUSARTx, uint32_t BaudRate)
+{
+
+	//Variable to hold the APB clock
+	uint32_t PCLKx;
+
+	uint32_t usartdiv;
+
+	//variables to hold Mantissa and Fraction values
+	uint32_t M_part,F_part;
+
+	uint32_t tempreg=0;
+
+	//Get the value of APB bus clock in to the variable PCLKx
+	if(pUSARTx == USART1 || pUSARTx == USART6)
+	{
+		//USART1 and USART6 are hanging on APB2 bus
+		PCLKx = RCC_GetPCLK2Value();
+	}else
+	{
+		PCLKx = RCC_GetPCLK1Value();
+	}
+
+	//Check for OVER8 configuration bit
+	if(pUSARTx->CR1 & (1 << TODO))
+	{
+		//OVER8 = 1 , over sampling by 8
+		usartdiv = ((25 * PCLKx) / (2 *BaudRate));
+	}else
+	{
+		//over sampling by 16
+		TODO
+	}
+
+	//Calculate the Mantissa part
+	M_part = TODO/100;
+
+	//Place the Mantissa part in appropriate bit position . refer USART_BRR
+	tempreg |= M_part << 4;
+
+	//Extract the fraction part
+	F_part = (usartdiv - (TODO * 100));
+
+	//Calculate the final fractional
+	if(pUSARTx->CR1 & ( 1 << USART_CR1_OVER8))
+	{
+		//OVER8 = 1 , over sampling by 8
+		F_part = ((( F_part * TODO)+ 50) / 100)& ((uint8_t)0x07);
+
+	}else
+	{
+		//over sampling by 16
+		F_part = ((( F_part * TODO)+ 50) / 100) & ((uint8_t)0x0F);
+
+	}
+
+	//Place the fractional part in appropriate bit position . refer USART_BRR
+	tempreg |= F_part;
+
+	//copy the value of tempreg in to BRR register
+	pUSARTx->TODO = tempreg;
 }
 
 /*
@@ -573,6 +650,126 @@ void USART_PeripheralControl(USART_RegDef_t *pUSARTx, uint8_t EnOrDi)
 	{
 		pUSARTx->CR1 &= ~( 1 << USART_CR1_UE);
 	}
+}
+
+uint16_t AHBPreArr[9] = {2,4,8,16,32,64,128,256,512};
+uint16_t APB1PreArr[4] = {2,4,8,16};
+
+/*************************************************************************************************
+ * @fn				- RCC_GetPCLK1Value
+ *
+ * @brief			-
+ *
+ * @param[in]		-
+ * @param[in]		-
+ * @param[in[		-
+ *
+ * @return			-
+ *
+ * @Note			-
+ *
+ *************************************************************************************************/
+uint32_t RCC_GetPCLK2Value()
+{
+	uint32_t SystemClock=0,tmp,pclk2;
+	uint8_t clk_src = ( RCC->CFGR >> 2) & 0X3;
+
+	uint8_t ahbp,apb2p;
+
+	if(clk_src == 0)
+	{
+		SystemClock = 16000000;
+	}else
+	{
+		SystemClock = 8000000;
+	}
+	tmp = (RCC->CFGR >> 4 ) & 0xF;
+
+	if(tmp < 0x08)
+	{
+		ahbp = 1;
+	}else
+	{
+		ahbp = AHBPreArr[tmp-8];
+	}
+
+	tmp = (RCC->CFGR >> 13 ) & 0x7;
+	if(tmp < 0x04)
+	{
+		apb2p = 1;
+	}else
+	{
+		apb2p = APB1PreArr[tmp-4];
+	}
+
+	pclk2 = (SystemClock / ahbp )/ apb2p;
+
+	return pclk2;
+}
+
+
+/*************************************************************************************************
+ * @fn				- RCC_GetPCLK1Value
+ *
+ * @brief			-
+ *
+ * @param[in]		-
+ * @param[in]		-
+ * @param[in[		-
+ *
+ * @return			-
+ *
+ * @Note			-
+ *
+ *************************************************************************************************/
+uint32_t RCC_GetPCLK1Value(void)
+{
+	uint32_t pclk1;
+	// 1. Get the clock source
+	uint8_t clocksource, temp, AHB1PRE, APB1PRE;
+
+	uint32_t ClkSrcFreq;
+	clocksource = ((RCC->CFGR >> 2) & 0x3);
+	if(clocksource == 0)
+	{
+		// HSI is used. Freq = 16LHz
+		ClkSrcFreq = 16000000;
+	}
+	else if(clocksource == 1)
+	{
+		// HSE is used. Freq = 8MHz
+		ClkSrcFreq = 8000000;
+	}
+	//	else if(clocksource == 2)
+	//	{
+	//		// PLL is used
+	//	}
+
+	// 2. Get the AHB prescalar
+	temp = ((RCC->CFGR >> 4) & 0xF);
+	if(temp < 8)
+	{
+		AHB1PRE = 1;
+	}
+	else
+	{
+		AHB1PRE = AHBPreArr[temp-8];
+	}
+
+	// 3. Get the APB1 Prescalar
+	temp = ((RCC->CFGR >> 10) & 0x7);
+	if(temp < 4)
+	{
+		APB1PRE = 1;
+	}
+	else
+	{
+		APB1PRE = APB1PreArr[temp-4];
+	}
+
+	pclk1 = ((ClkSrcFreq / AHB1PRE) / APB1PRE);
+
+	return pclk1;
 }
 
 
