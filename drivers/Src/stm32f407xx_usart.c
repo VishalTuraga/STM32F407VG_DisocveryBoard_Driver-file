@@ -877,7 +877,7 @@ void USART_IRQHandling(USART_Handle_t *pUSARTHandle)
 		//Need not to clear the ORE flag here, instead give an api for the application to clear the ORE flag .
 
 		//this interrupt is because of Overrun error
-		USART_ApplicationEventCallback(pUSARTHandle,USART_EVENT_ORE);
+		USART_ApplicationEventCallback(pUSARTHandle,USART_ERR_ORE);
 	}
 
 
@@ -900,7 +900,7 @@ void USART_IRQHandling(USART_Handle_t *pUSARTHandle)
 				is detected. It is cleared by a software sequence (an read to the USART_SR register
 				followed by a read to the USART_DR register).
 			*/
-			USART_ApplicationEventCallback(pUSARTHandle,USART_ERREVENT_FE);
+			USART_ApplicationEventCallback(pUSARTHandle,USART_ERR_FE);
 		}
 
 		if(temp1 & ( 1 << USART_SR_NE) )
@@ -915,7 +915,7 @@ void USART_IRQHandling(USART_Handle_t *pUSARTHandle)
 
 		if(temp1 & ( 1 << USART_SR_ORE) )
 		{
-			USART_ApplicationEventCallback(pUSARTHandle,USART_ERREVENT_ORE);
+			USART_ApplicationEventCallback(pUSARTHandle,USART_ERR_ORE);
 		}
 	}
 
