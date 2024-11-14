@@ -23,12 +23,19 @@ typedef struct
 	uint8_t		USART_HWFlowControl;
 }USART_Config_t;
 
+/*
+ * USART TxRx State
+ */
+#define USART_BUSY_IN_TX					1
+#define USART_BUSY_IN_RX					2
+#define USART_READY							0
 
 /*
  * USART Flags
  */
 #define USART_FLAG_TXE						(1 << 7)
 #define USART_FLAG_TC						(1 << 6)
+#define USART_FLAG_RXNE						(1 << 5)
 
 /*
  *@USART_Mode
@@ -96,6 +103,12 @@ typedef struct
 {
 	USART_Config_t USART_Config;
 	USART_RegDef_t *pUSARTx;
+	uint8_t *pTxBuffer;
+	uint8_t *pRxBuffer;
+	uint32_t TxLen;
+	uint32_t RxLen;
+	uint8_t TxBusyState;
+	uint8_t RxBusyState;
 }USART_Handle_t;
 
 /******************************************************************************************
@@ -121,6 +134,8 @@ void USART_SendData(USART_RegDef_t *pUSARTx,uint8_t *pTxBuffer, uint32_t Len);
 void USART_ReceiveData(USART_RegDef_t *pUSARTx, uint8_t *pRxBuffer, uint32_t Len);
 uint8_t USART_SendDataIT(USART_Handle_t *pUSARTHandle,uint8_t *pTxBuffer, uint32_t Len);
 uint8_t USART_ReceiveDataIT(USART_Handle_t *pUSARTHandle, uint8_t *pRxBuffer, uint32_t Len);
+
+void USART_SetBaudRate(USART_RegDef_t *pUSARTx, uint32_t BaudRate);
 
 /*
  * IRQ Configuration and ISR handling
