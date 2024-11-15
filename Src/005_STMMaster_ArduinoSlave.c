@@ -12,6 +12,7 @@
 GPIO_Handle_t 	SPIPins;
 SPI_Handle_t 	SPI_2;
 GPIO_Handle_t Button;
+GPIO_Handle_t LED;
 
 void delay(void)
 {
@@ -19,6 +20,19 @@ void delay(void)
 }
 
 char user_data[] = "This is the data sent to the master everytime there is a button pressed";
+
+void LED_Config(void)
+{
+	memset(&LED,0,sizeof(LED));
+	LED.pGPIOx = GPIOD;
+	LED.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_12;
+	LED.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_OUT;
+	LED.GPIO_PinConfig.GPIO_PinOPType = GPIO_OUT_TYPE_PP;
+	LED.GPIO_PinConfig.GPIO_PinSpeed = GPIO_OUT_SPEED_LOW;
+
+	GPIO_ClockControl(LED.pGPIOx, ENABLE);
+	GPIO_Init(&LED);
+}
 
 void Button_Config(void)
 {
@@ -32,7 +46,7 @@ void Button_Config(void)
 	GPIO_Init(&Button);
 }
 
-SPI2_GPIOInits(void)
+void SPI2_GPIOInits(void)
 {
 	SPIPins.pGPIOx = GPIOB;
 	SPIPins.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_ALTFN;
@@ -48,11 +62,11 @@ SPI2_GPIOInits(void)
 	SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_14;
 	GPIO_Init(&SPIPins);
 
-	SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_16;
+	SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_15;
 	GPIO_Init(&SPIPins);
 }
 
-SPI2_Inits(void)
+void SPI2_Inits(void)
 {
 	SPI_2.pSPIx = SPI2;
 	SPI_2.SPIConfig.BusConfig = SPI_BUSCONFIG_FULLDUPLEX;
@@ -65,12 +79,12 @@ SPI2_Inits(void)
 
 	SPI_Init(&SPI_2);
 
-	while(1);
-
 }
 
 int main(void)
 {
+	LED_Config();
+
 	Button_Config();
 
 	SPI2_GPIOInits();
@@ -79,9 +93,11 @@ int main(void)
 
 	SPI_SSOEConfig(SPI2, ENABLE);
 
+	GPIO_WritePin(GPIOD, GPIO_PIN_12, ENABLE);
 	GPIO_IRQPriorityConfig(IRQ_EXTI0, 1);
 	GPIO_IRQITConfig(IRQ_EXTI0, ENABLE);
 
+	while(1);
 
 	return 0;
 }
@@ -90,7 +106,8 @@ void EXTI0_IRQHandler(void)
 {
 	delay();
 	GPIO_IRQHandling(GPIO_PIN_0);
-	SPI_PeriheralControl(SPI2, ENABLE);
+	GPIO_TogglePinOutput(GPIOD, GPIO_PIN_12);
+	SPI_PeripheralControl(SPI2, ENABLE);
 
 	// sending len info
 	uint8_t stringlen = strlen(user_data);
@@ -99,5 +116,5 @@ void EXTI0_IRQHandler(void)
 	// sending datta
 	SPI_SendData(SPI2, (uint8_t*)user_data, strlen(user_data));
 	if((SPI2->SR & (1 << SPI_SR_BSY)) == 0)
-		SPI_PeriheralControl(SPI2, DISABLE);
+		SPI_PeripheralControl(SPI2, DISABLE);
 }

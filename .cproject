@@ -81,13 +81,13 @@
 							<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1423007181" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 						</tool>
 					</fileInfo>
-					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.903353543.45735451" name="stm32f407xx_usart.c" rcbsApplicability="disable" resourcePath="drivers/Src/stm32f407xx_usart.c" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.2018552881.536588149">
-						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.2018552881.536588149" name="MCU/MPU GCC Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.2018552881"/>
+					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.903353543.1596959944" name="005_STMMaster_ArduinoSlave.c" rcbsApplicability="disable" resourcePath="Src/005_STMMaster_ArduinoSlave.c" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.2018552881.766263515">
+						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.2018552881.766263515" name="MCU/MPU GCC Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.2018552881"/>
 					</fileInfo>
 					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.903353543.374823504" name="stm32f407x_usart.h" rcbsApplicability="disable" resourcePath="drivers/Inc/stm32f407x_usart.h" toolsToInvoke=""/>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Inc"/>
-						<entry excluding="008I2CMasterReadData.c|007SPIExercise.c|006_SPIMaster_Send_Receive.c|005_STMMaster_ArduinoSlave.c|004SPI_tx_testing.c|003led_button_interrupt.c|002led_button_toggle.c|001led_toggle.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Src"/>
+						<entry excluding="003led_button_interrupt.c|008RTCLCD.c|008I2CMasterReadData.c|007SPIExercise.c|006_SPIMaster_Send_Receive.c|004SPI_tx_testing.c|002led_button_toggle.c|001led_toggle.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Src"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Startup"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="drivers"/>
 					</sourceEntries>

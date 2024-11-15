@@ -48,6 +48,7 @@ void LED_Config(void)
 
 void Button_Config(void)
 {
+	GPIO_Handle_t Button;
 	memset(&Button,0,sizeof(Button));
 	Button.pGPIOx = GPIOA;
 	Button.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_0;

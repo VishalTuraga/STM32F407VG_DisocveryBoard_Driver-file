@@ -270,12 +270,12 @@ void SPI_Deinit(SPI_RegDef_t *pSPIx)
  * @Note			-
  *
  *************************************************************************************************/
-void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t len)
+void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, int32_t len)
 {
 	while(len > 0)
 	{
 		while(!(pSPIx->SR & (1<<SPI_SR_TXE)));
-		if((pSPIx->CR1 & (1 << SPI_CR1_DFF)) == SPI_DFF_8BIT)
+		if((pSPIx->CR1 & (1 << SPI_CR1_DFF)) == SPI_DFF_16BIT)
 		{
 			// shift register is 16 bits
 			pSPIx->DR = *(uint16_t*)pTxBuffer;

@@ -1,0 +1,7 @@
+../Src/005_STMMaster_ArduinoSlave.c:17:6:delay	2
+../Src/005_STMMaster_ArduinoSlave.c:24:6:LED_Config	1
+../Src/005_STMMaster_ArduinoSlave.c:37:6:Button_Config	1
+../Src/005_STMMaster_ArduinoSlave.c:49:6:SPI2_GPIOInits	1
+../Src/005_STMMaster_ArduinoSlave.c:69:6:SPI2_Inits	1
+../Src/005_STMMaster_ArduinoSlave.c:84:5:main	1
+../Src/005_STMMaster_ArduinoSlave.c:105:6:EXTI0_IRQHandler	2
