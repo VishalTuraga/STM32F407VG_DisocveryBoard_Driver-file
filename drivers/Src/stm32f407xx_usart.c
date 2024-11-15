@@ -25,7 +25,7 @@
  *************************************************************************************************/
 uint8_t USART_GetFlagStatus(USART_RegDef_t *pUSARTx , uint32_t FlagName)
 {
-	if((pUSARTx->SR1 & FlagName))
+	if((pUSARTx->SR & FlagName))
 	{
 		return FLAG_SET;
 	}
@@ -46,7 +46,7 @@ uint8_t USART_GetFlagStatus(USART_RegDef_t *pUSARTx , uint32_t FlagName)
  * @Note			-
  *
  *************************************************************************************************/
-uint8_t USART_ClearFlag(USART_RegDef_t *pUSARTx , uint32_t FlagName)
+void USART_ClearFlag(USART_RegDef_t *pUSARTx , uint32_t FlagName)
 {
 	pUSARTx->SR &= ~(1 << FlagName);
 }
@@ -625,13 +625,15 @@ void USART_IRQHandling(USART_Handle_t *pUSARTHandle)
 
 	uint32_t temp1 , temp2, temp3;
 
+	uint16_t *pdata;
+
 /*************************Check for TC flag ********************************************/
 
     //Implement the code to check the state of TC bit in the SR
 	temp1 = pUSARTHandle->pUSARTx->SR & ( 1 << USART_SR_TC);
 
 	 //Implement the code to check the state of TCEIE bit
-	temp2 = pUSARTHandle->pUSARTx->TODO & ( 1 << USART_CR1_TCIE);
+	temp2 = pUSARTHandle->pUSARTx->CR1 & ( 1 << USART_CR1_TCIE);
 
 	if(temp1 && temp2 )
 	{
@@ -686,7 +688,7 @@ void USART_IRQHandling(USART_Handle_t *pUSARTHandle)
 				if(pUSARTHandle->USART_Config.USART_WordLength == USART_WORDLEN_9BITS)
 				{
 					//if 9BIT , load the DR with 2bytes masking the bits other than first 9 bits
-					pdata = (uint16_t*) pTxBuffer;
+					pdata = (uint16_t*) pUSARTHandle->pTxBuffer;
 
 					//loading only first 9 bits , so we have to mask with the value 0x01FF
 					pUSARTHandle->pUSARTx->DR = (*pdata & (uint16_t)0x01FF);
@@ -696,8 +698,8 @@ void USART_IRQHandling(USART_Handle_t *pUSARTHandle)
 					{
 						//No parity is used in this transfer , so, 9bits of user data will be sent
 						//Implement the code to increment pTxBuffer twice
-						pTxBuffer++;
-						pTxBuffer++;
+						pUSARTHandle->pTxBuffer++;
+						pUSARTHandle->pTxBuffer++;
 
 						//Implement the code to decrement the length
 						pUSARTHandle->TxLen-=2;
@@ -706,7 +708,7 @@ void USART_IRQHandling(USART_Handle_t *pUSARTHandle)
 					{
 						//Parity bit is used in this transfer . so , 8bits of user data will be sent
 						//The 9th bit will be replaced by parity bit by the hardware
-						pTxBuffer++;
+						pUSARTHandle->pTxBuffer++;
 
 						//Implement the code to decrement the length
 						pUSARTHandle->TxLen--;
@@ -715,17 +717,17 @@ void USART_IRQHandling(USART_Handle_t *pUSARTHandle)
 				else
 				{
 					//This is 8bit data transfer
-					pUSARTHandle->pUSARTx->DR = (*pTxBuffer  & (uint8_t)0xFF);
+					pUSARTHandle->pUSARTx->DR = (*pUSARTHandle->pTxBuffer  & (uint8_t)0xFF);
 
 					//Implement the code to increment the buffer address
-					pTxBuffer++;
+					pUSARTHandle->pTxBuffer++;
 
 					//Implement the code to decrement the length
 					pUSARTHandle->TxLen--;
 				}
 
 			}
-			if (TxLen == 0 )
+			if (pUSARTHandle->TxLen == 0 )
 			{
 				//TxLen is zero
 				//Implement the code to clear the TXEIE bit (disable interrupt for TXE flag )
@@ -760,11 +762,11 @@ void USART_IRQHandling(USART_Handle_t *pUSARTHandle)
 						//No parity is used. so, all 9bits will be of user data
 
 						//read only first 9 bits so mask the DR with 0x01FF
-						*((uint16_t*) pRxBuffer) = (pUSARTHandle->pUSARTx->DR  & (uint16_t)0x01FF);
+						*((uint16_t*)pUSARTHandle->pRxBuffer) = (pUSARTHandle->pUSARTx->DR  & (uint16_t)0x01FF);
 
 						//Now increment the pRxBuffer two times
-						pRxBuffer++;
-						pRxBuffer++;
+						pUSARTHandle->pRxBuffer++;
+						pUSARTHandle->pRxBuffer++;
 
 						//Implement the code to decrement the length
 						pUSARTHandle->RxLen-=2;
@@ -772,10 +774,10 @@ void USART_IRQHandling(USART_Handle_t *pUSARTHandle)
 					else
 					{
 						//Parity is used. so, 8bits will be of user data and 1 bit is parity
-						 *pRxBuffer = (pUSARTHandle->pUSARTx->DR  & (uint8_t)0xFF);
+						 *pUSARTHandle->pRxBuffer = (pUSARTHandle->pUSARTx->DR  & (uint8_t)0xFF);
 
 						 //Now increment the pRxBuffer
-						 pRxBuffer++;
+						 pUSARTHandle->pRxBuffer++;
 
 						 //Implement the code to decrement the length
 						 pUSARTHandle->RxLen--;
@@ -791,7 +793,7 @@ void USART_IRQHandling(USART_Handle_t *pUSARTHandle)
 						//No parity is used , so all 8bits will be of user data
 
 						//read 8 bits from DR
-						 *pRxBuffer = (uint8_t) (pUSARTHandle->pUSARTx->DR  & (uint8_t)0xFF);
+						 *pUSARTHandle->pRxBuffer = (uint8_t) (pUSARTHandle->pUSARTx->DR  & (uint8_t)0xFF);
 					}
 
 					else
@@ -799,12 +801,12 @@ void USART_IRQHandling(USART_Handle_t *pUSARTHandle)
 						//Parity is used, so , 7 bits will be of user data and 1 bit is parity
 
 						//read only 7 bits , hence mask the DR with 0X7F
-						 *pRxBuffer = (uint8_t) (pUSARTHandle->pUSARTx->DR  & (uint8_t)0x7F);
+						 *pUSARTHandle->pRxBuffer = (uint8_t) (pUSARTHandle->pUSARTx->DR  & (uint8_t)0x7F);
 
 					}
 
 					//Now , increment the pRxBuffer
-					pRxBuffer++;
+					pUSARTHandle->pRxBuffer++;
 
 					//Implement the code to decrement the length
 					pUSARTHandle->RxLen--;
@@ -910,7 +912,7 @@ void USART_IRQHandling(USART_Handle_t *pUSARTHandle)
 				software sequence (an read to the USART_SR register followed by a read to the
 				USART_DR register).
 			*/
-			USART_ApplicationEventCallback(pUSARTHandle,USART_ERREVENT_NE);
+			USART_ApplicationEventCallback(pUSARTHandle,USART_ERR_NE);
 		}
 
 		if(temp1 & ( 1 << USART_SR_ORE) )
@@ -952,125 +954,6 @@ void USART_PeripheralControl(USART_RegDef_t *pUSARTx, uint8_t EnOrDi)
 	}
 }
 
-uint16_t AHBPreArr[9] = {2,4,8,16,32,64,128,256,512};
-uint16_t APB1PreArr[4] = {2,4,8,16};
-
-/*************************************************************************************************
- * @fn				- RCC_GetPCLK1Value
- *
- * @brief			-
- *
- * @param[in]		-
- * @param[in]		-
- * @param[in[		-
- *
- * @return			-
- *
- * @Note			-
- *
- *************************************************************************************************/
-uint32_t RCC_GetPCLK2Value()
-{
-	uint32_t SystemClock=0,tmp,pclk2;
-	uint8_t clk_src = ( RCC->CFGR >> 2) & 0X3;
-
-	uint8_t ahbp,apb2p;
-
-	if(clk_src == 0)
-	{
-		SystemClock = 16000000;
-	}else
-	{
-		SystemClock = 8000000;
-	}
-	tmp = (RCC->CFGR >> 4 ) & 0xF;
-
-	if(tmp < 0x08)
-	{
-		ahbp = 1;
-	}else
-	{
-		ahbp = AHBPreArr[tmp-8];
-	}
-
-	tmp = (RCC->CFGR >> 13 ) & 0x7;
-	if(tmp < 0x04)
-	{
-		apb2p = 1;
-	}else
-	{
-		apb2p = APB1PreArr[tmp-4];
-	}
-
-	pclk2 = (SystemClock / ahbp )/ apb2p;
-
-	return pclk2;
-}
-
-
-/*************************************************************************************************
- * @fn				- RCC_GetPCLK1Value
- *
- * @brief			-
- *
- * @param[in]		-
- * @param[in]		-
- * @param[in[		-
- *
- * @return			-
- *
- * @Note			-
- *
- *************************************************************************************************/
-uint32_t RCC_GetPCLK1Value(void)
-{
-	uint32_t pclk1;
-	// 1. Get the clock source
-	uint8_t clocksource, temp, AHB1PRE, APB1PRE;
-
-	uint32_t ClkSrcFreq;
-	clocksource = ((RCC->CFGR >> 2) & 0x3);
-	if(clocksource == 0)
-	{
-		// HSI is used. Freq = 16LHz
-		ClkSrcFreq = 16000000;
-	}
-	else if(clocksource == 1)
-	{
-		// HSE is used. Freq = 8MHz
-		ClkSrcFreq = 8000000;
-	}
-	//	else if(clocksource == 2)
-	//	{
-	//		// PLL is used
-	//	}
-
-	// 2. Get the AHB prescalar
-	temp = ((RCC->CFGR >> 4) & 0xF);
-	if(temp < 8)
-	{
-		AHB1PRE = 1;
-	}
-	else
-	{
-		AHB1PRE = AHBPreArr[temp-8];
-	}
-
-	// 3. Get the APB1 Prescalar
-	temp = ((RCC->CFGR >> 10) & 0x7);
-	if(temp < 4)
-	{
-		APB1PRE = 1;
-	}
-	else
-	{
-		APB1PRE = APB1PreArr[temp-4];
-	}
-
-	pclk1 = ((ClkSrcFreq / AHB1PRE) / APB1PRE);
-
-	return pclk1;
-}
 
 
 /*

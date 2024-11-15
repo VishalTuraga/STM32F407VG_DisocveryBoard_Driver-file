@@ -686,7 +686,7 @@ typedef struct
 #define USART_SR_RXNE					5
 #define USART_SR_IDLE					4
 #define USART_SR_ORE					3
-#define USART_SR_NF						2
+#define USART_SR_NE						2
 #define USART_SR_FE						1
 #define USART_SR_PE						0
 
@@ -767,5 +767,6 @@ typedef struct
 #include "stm32f407xx_spi.h"
 #include "stm32f407xx_i2c.h"
 #include "stm32f407x_usart.h"
+#include "stm32f407xx_RCC.h"
 
 #endif /* INC_STM32F407XX_H_ */
