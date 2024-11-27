@@ -59,8 +59,8 @@ void SPI2_GPIOInits(void)
 	SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_13;
 	GPIO_Init(&SPIPins);
 
-	SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_14;
-	GPIO_Init(&SPIPins);
+	//	SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_14;
+	//	GPIO_Init(&SPIPins);
 
 	SPIPins.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_15;
 	GPIO_Init(&SPIPins);

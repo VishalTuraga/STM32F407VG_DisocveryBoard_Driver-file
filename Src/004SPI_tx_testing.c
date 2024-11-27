@@ -69,7 +69,7 @@ int main(void)
 
 	SPI2_Init();
 
-	SPI_PeriheralControl(SPI2, ENABLE);
+	SPI_PeripheralControl(SPI2, ENABLE);
 
 	char user_data[] = "Hello World";
 
@@ -77,7 +77,7 @@ int main(void)
 
 	while(1);
 
-	SPI_PeriheralControl(SPI2, DISABLE);
+	SPI_PeripheralControl(SPI2, DISABLE);
 
 	return 0;
 }

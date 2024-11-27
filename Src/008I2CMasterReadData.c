@@ -38,23 +38,23 @@ int main(void)
 
 	ButtonGPIOInits();
 
-	GPIO_IRQITConfig(IRQ_EXTI0, ENABLE);
+	//	GPIO_IRQITConfig(IRQ_EXTI0, ENABLE);
 
 	/*
 	 * if we are not using button interrupt then the code will look like this
-	 * I2C_PeripheralControl(I2C1Handle.pI2Cx, ENABLE);
-	 * while(1)
-	 * {
-	 * 		I2C_MasterSendData(&I2C1Handle, CMDReadLen, 1, SLAVEADDR);
-
-			I2C_MasterReceiveData(&I2C1Handle, &length, 1, SLAVEADDR);
-
-			I2C_MasterSendData(&I2C1Handle, CMDReadData, 1, SLAVEADDR);
-
-			I2C_MasterReceiveData(&I2C1Handle, buffer, length, SLAVEADDR);
-	 * }
-	 * I2C_PeripheralControl(I2C1Handle, DISABLE);
+	 *
 	 */
+	I2C_PeripheralControl(I2C1Handle.pI2Cx, ENABLE);
+	while(1)
+	{
+
+		I2C_MasterSendData(&I2C1Handle, &CMDReadLen, 1, SLAVEADDR,I2C_SR);
+		I2C_MasterReceiveData(&I2C1Handle, &length, 1, SLAVEADDR,I2C_SR);
+		I2C_MasterSendData(&I2C1Handle, &CMDReadData, 1, SLAVEADDR,I2C_SR);
+		I2C_MasterReceiveData(&I2C1Handle, buffer, length, SLAVEADDR, I2C_NO_SR);
+	}
+	I2C_PeripheralControl(I2C1Handle.pI2Cx, DISABLE);
+
 
 	printf("Data received: %s\n",buffer);
 
@@ -103,21 +103,21 @@ void I2C1Inits(void)
 
 }
 
-void EXTI0_IRQHandler()
-{
-	GPIO_IRQHandling(GPIO_PIN_0);
-
-	I2C_PeripheralControl(I2C1Handle.pI2Cx, ENABLE);
-
-	I2C_ManageAcking(I2C1Handle.pI2Cx, ENABLE);
-
-	I2C_MasterSendData(&I2C1Handle, &CMDReadLen, 1, SLAVEADDR, I2C_SR);
-
-	I2C_MasterReceiveData(&I2C1Handle, &length, 1, SLAVEADDR, I2C_SR);
-
-	I2C_MasterSendData(&I2C1Handle, &CMDReadData, 1, SLAVEADDR,I2C_SR);
-
-	I2C_MasterReceiveData(&I2C1Handle, buffer, length, SLAVEADDR, I2C_NO_SR);
-
-	I2C_PeripheralControl(I2C1Handle.pI2Cx, DISABLE);
-}
+//void EXTI0_IRQHandler()
+//{
+//	GPIO_IRQHandling(GPIO_PIN_0);
+//
+//	I2C_PeripheralControl(I2C1Handle.pI2Cx, ENABLE);
+//
+//	I2C_ManageAcking(I2C1Handle.pI2Cx, ENABLE);
+//
+//	I2C_MasterSendData(&I2C1Handle, &CMDReadLen, 1, SLAVEADDR, I2C_SR);
+//
+//	I2C_MasterReceiveData(&I2C1Handle, &length, 1, SLAVEADDR, I2C_SR);
+//
+//	I2C_MasterSendData(&I2C1Handle, &CMDReadData, 1, SLAVEADDR,I2C_SR);
+//
+//	I2C_MasterReceiveData(&I2C1Handle, buffer, length, SLAVEADDR, I2C_NO_SR);
+//
+//	I2C_PeripheralControl(I2C1Handle.pI2Cx, DISABLE);
+//}

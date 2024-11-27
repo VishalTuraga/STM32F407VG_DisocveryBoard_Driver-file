@@ -85,6 +85,23 @@ typedef struct
 #define I2C_EV_DATA_REQ			8
 #define I2C_EV_DATA_RCV			9
 
+/*
+ * I2C Status flag definitions
+ */
+#define I2C_FLAG_SMBALERT		1 << I2C_SR1_SMBALERT
+#define I2C_FLAG_TIMEOUT		1 << I2C_SR1_TIMEOUT
+#define I2C_FLAG_PECERR			1 << I2C_SR1_PECERR
+#define I2C_FLAG_OVR			1 << I2C_SR1_OVR
+#define I2C_FLAG_AF				1 << I2C_SR1_AF
+#define I2C_FLAG_ARLO			1 << I2C_SR1_ARLO
+#define I2C_FLAG_BERR			1 << I2C_SR1_BERR
+#define I2C_FLAG_TxE			1 << I2C_SR1_TxE
+#define I2C_FLAG_RxNE			1 << I2C_SR1_RxNE
+#define I2C_FLAG_STOPF			1 << I2C_SR1_STOPF
+#define I2C_FLAG_ADD10			1 << I2C_SR1_ADD10
+#define I2C_FLAG_BTF			1 << I2C_SR1_BTF
+#define I2C_FLAG_ADDR			1 << I2C_SR1_ADDR
+#define I2C_FLAG_SB				1 << I2C_SR1_SB
 
 /**************************************************************************************************************************************
  * 														APIs supported by this driver

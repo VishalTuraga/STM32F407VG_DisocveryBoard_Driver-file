@@ -123,7 +123,7 @@ void I2C_PeripheralControl(I2C_RegDef_t *pI2Cx, uint8_t EnOrDi)
 	}
 	else if(EnOrDi == DISABLE)
 	{
-		pI2Cx->CR1 |= (1 << I2C_CR1_PE);
+		pI2Cx->CR1 &= ~(1 << I2C_CR1_PE);
 	}
 }
 
@@ -196,7 +196,7 @@ void I2C_ClockControl(I2C_RegDef_t *pI2Cx, uint8_t EnorDi)
  *************************************************************************************************/
 void I2C_Init(I2C_Handle_t *pI2CHandle)
 {
-	I2C_PeripheralControl(pI2CHandle->pI2Cx, ENABLE);
+	I2C_ClockControl(pI2CHandle->pI2Cx, ENABLE);
 	uint32_t tempreg = 0;
 	//1. Configure the mode (Standard or fast)
 	uint16_t ccr_value = 0;
@@ -312,7 +312,7 @@ void I2C_Deinit(I2C_RegDef_t *pI2Cx)
  *************************************************************************************************/
 uint8_t I2C_GetFlagStatus(I2C_RegDef_t *pI2Cx , uint32_t FlagName)
 {
-	if((pI2Cx->SR1 & FlagName) || (pI2Cx->SR2 & FlagName))
+	if((pI2Cx->SR1 & FlagName))
 	{
 		return FLAG_SET;
 	}
@@ -343,7 +343,7 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *TxBuffer, uint8_t len
 	pI2CHandle->pI2Cx->CR1 |= (1 << I2C_CR1_START);
 
 	// 2. Check if the start bit is set and then Read the SR1 register to clear the start bit
-	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,I2C_SR1_SB) == FLAG_SET));
+	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,I2C_FLAG_SB)));
 	//uint32_t temp = pI2CHandle->pI2Cx->SR1;
 
 	// 3. Send the address of slave with transmission byte (0)
@@ -352,7 +352,7 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *TxBuffer, uint8_t len
 	pI2CHandle->pI2Cx->DR = SlaveAddr;
 
 	// 4. ADDR bit is set if it receives an ACK
-	if(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_SR1_ADDR)))
+	if(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_FLAG_ADDR)))
 	{
 		// The ADDR bit is set which means that the master received an ack. Now we should reset this ADDR bit
 		// read SR1 and SR2 to clear this bit
@@ -363,7 +363,7 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *TxBuffer, uint8_t len
 	while(len)
 	{
 		// wait till Txe is 1 indicating that DR is empty and ready to be filled with data
-		while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_SR1_TxE))))
+		while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_FLAG_TxE))))
 		{
 			pI2CHandle->pI2Cx->DR = *TxBuffer;
 			TxBuffer++;
@@ -373,8 +373,8 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *TxBuffer, uint8_t len
 
 	// 6. Close the communication
 	// 6.1 wait for Txe = 1 and BTF = 1 before generating the stop condition
-	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_SR1_TxE))));
-	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_SR1_BTF))));
+	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_FLAG_TxE))));
+	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_FLAG_BTF))));
 
 	// 6.2 Generate the stop condition (if repeated start isn't enabled)
 	if(Sr == I2C_NO_SR)
@@ -407,7 +407,7 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *RxBuffer, uint8_t 
 	pI2CHandle->pI2Cx->CR1 |= (1 << I2C_CR1_START);
 
 	// 2. Confirm if the start bit is set
-	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,I2C_SR1_SB)));
+	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,I2C_FLAG_SB)));
 
 	// 3. Send Address bit
 	SlaveAddr = SlaveAddr << 1;
@@ -415,7 +415,7 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *RxBuffer, uint8_t 
 	pI2CHandle->pI2Cx->DR = SlaveAddr;
 
 	// 4. check if the ADDR flag is set. Wait until its set
-	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_SR1_ADDR))));
+	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_FLAG_ADDR))));
 
 	// 5. Send data. If len = 1 or if len > 1
 	if(len == 1)
@@ -427,7 +427,7 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *RxBuffer, uint8_t 
 		I2C_ClearADDRFlag(pI2CHandle);
 
 		// d. wait till RXNE is set
-		while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, (1 << I2C_SR1_RxNE)));
+		while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, (1 << I2C_FLAG_RxNE)));
 
 		// b. send stop condition if repeated start is disabled
 		if(Sr == I2C_NO_SR)
@@ -449,7 +449,7 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *RxBuffer, uint8_t 
 		while(len > 0)
 		{
 			// d. wait till RXNE becomes 1
-			while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, (1 << I2C_SR1_RxNE)));
+			while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, (1 << I2C_FLAG_RxNE)));
 
 			if(len == 2)
 			{
