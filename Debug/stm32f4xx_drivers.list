@@ -39,15 +39,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  17 .debug_macro  00002fb9  00000000  00000000  000044a6  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line   0000260e  00000000  00000000  0000745f  2**0
+ 18 .debug_line   00002626  00000000  00000000  0000745f  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    0000b86e  00000000  00000000  00009a6d  2**0
+ 19 .debug_str    0000b86e  00000000  00000000  00009a85  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .comment      00000043  00000000  00000000  000152db  2**0
+ 20 .comment      00000043  00000000  00000000  000152f3  2**0
                   CONTENTS, READONLY
- 21 .debug_frame  000006b4  00000000  00000000  00015320  2**2
+ 21 .debug_frame  000006b4  00000000  00000000  00015338  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_line_str 00000052  00000000  00000000  000159d4  2**0
+ 22 .debug_line_str 00000052  00000000  00000000  000159ec  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1041,78 +1041,79 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *TxBuffer, uint8_t len
  80006c2:	79ba      	ldrb	r2, [r7, #6]
  80006c4:	611a      	str	r2, [r3, #16]
 
-	// 4. ADDR bit is set if it receives an ACK
-	if(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_FLAG_ADDR)))
- 80006c6:	68fb      	ldr	r3, [r7, #12]
- 80006c8:	689b      	ldr	r3, [r3, #8]
- 80006ca:	2104      	movs	r1, #4
- 80006cc:	4618      	mov	r0, r3
- 80006ce:	f7ff ffbf 	bl	8000650 <I2C_GetFlagStatus>
- 80006d2:	4603      	mov	r3, r0
- 80006d4:	2b00      	cmp	r3, #0
- 80006d6:	d018      	beq.n	800070a <I2C_MasterSendData+0x94>
-	{
-		// The ADDR bit is set which means that the master received an ack. Now we should reset this ADDR bit
-		// read SR1 and SR2 to clear this bit
-		I2C_ClearADDRFlag(pI2CHandle);
- 80006d8:	68f8      	ldr	r0, [r7, #12]
- 80006da:	f7ff fe5a 	bl	8000392 <I2C_ClearADDRFlag>
-	}
+	// 4. Confirm that address phase is completed by checking the ADDR flag in the SR1
+	while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx,(I2C_FLAG_ADDR)));
+ 80006c6:	bf00      	nop
+ 80006c8:	68fb      	ldr	r3, [r7, #12]
+ 80006ca:	689b      	ldr	r3, [r3, #8]
+ 80006cc:	2102      	movs	r1, #2
+ 80006ce:	4618      	mov	r0, r3
+ 80006d0:	f7ff ffbe 	bl	8000650 <I2C_GetFlagStatus>
+ 80006d4:	4603      	mov	r3, r0
+ 80006d6:	2b00      	cmp	r3, #0
+ 80006d8:	d0f6      	beq.n	80006c8 <I2C_MasterSendData+0x52>
+
+	// The ADDR bit is set which means that the master received an ack. Now we should reset this ADDR bit
+	// read SR1 and SR2 to clear this bit
+	I2C_ClearADDRFlag(pI2CHandle);
+ 80006da:	68f8      	ldr	r0, [r7, #12]
+ 80006dc:	f7ff fe59 	bl	8000392 <I2C_ClearADDRFlag>
+
 
 	// 5. Send data till len becomes zero. We don't have to check for ack every time as it is handled by the hardware
 	while(len)
- 80006de:	e014      	b.n	800070a <I2C_MasterSendData+0x94>
+ 80006e0:	e014      	b.n	800070c <I2C_MasterSendData+0x96>
 	{
 		// wait till Txe is 1 indicating that DR is empty and ready to be filled with data
-		while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_FLAG_TxE))))
-		{
-			pI2CHandle->pI2Cx->DR = *TxBuffer;
- 80006e0:	68bb      	ldr	r3, [r7, #8]
- 80006e2:	781a      	ldrb	r2, [r3, #0]
+		while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(I2C_FLAG_TxE))));
+ 80006e2:	bf00      	nop
  80006e4:	68fb      	ldr	r3, [r7, #12]
  80006e6:	689b      	ldr	r3, [r3, #8]
- 80006e8:	611a      	str	r2, [r3, #16]
-			TxBuffer++;
- 80006ea:	68bb      	ldr	r3, [r7, #8]
- 80006ec:	3301      	adds	r3, #1
- 80006ee:	60bb      	str	r3, [r7, #8]
-			len--;
- 80006f0:	79fb      	ldrb	r3, [r7, #7]
- 80006f2:	3b01      	subs	r3, #1
- 80006f4:	71fb      	strb	r3, [r7, #7]
-		while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_FLAG_TxE))))
- 80006f6:	68fb      	ldr	r3, [r7, #12]
- 80006f8:	689b      	ldr	r3, [r3, #8]
- 80006fa:	f44f 7180 	mov.w	r1, #256	@ 0x100
- 80006fe:	4618      	mov	r0, r3
- 8000700:	f7ff ffa6 	bl	8000650 <I2C_GetFlagStatus>
- 8000704:	4603      	mov	r3, r0
- 8000706:	2b00      	cmp	r3, #0
- 8000708:	d0ea      	beq.n	80006e0 <I2C_MasterSendData+0x6a>
+ 80006e8:	2180      	movs	r1, #128	@ 0x80
+ 80006ea:	4618      	mov	r0, r3
+ 80006ec:	f7ff ffb0 	bl	8000650 <I2C_GetFlagStatus>
+ 80006f0:	4603      	mov	r3, r0
+ 80006f2:	2b00      	cmp	r3, #0
+ 80006f4:	d0f6      	beq.n	80006e4 <I2C_MasterSendData+0x6e>
+
+		pI2CHandle->pI2Cx->DR = *TxBuffer;
+ 80006f6:	68bb      	ldr	r3, [r7, #8]
+ 80006f8:	781a      	ldrb	r2, [r3, #0]
+ 80006fa:	68fb      	ldr	r3, [r7, #12]
+ 80006fc:	689b      	ldr	r3, [r3, #8]
+ 80006fe:	611a      	str	r2, [r3, #16]
+		TxBuffer++;
+ 8000700:	68bb      	ldr	r3, [r7, #8]
+ 8000702:	3301      	adds	r3, #1
+ 8000704:	60bb      	str	r3, [r7, #8]
+		len--;
+ 8000706:	79fb      	ldrb	r3, [r7, #7]
+ 8000708:	3b01      	subs	r3, #1
+ 800070a:	71fb      	strb	r3, [r7, #7]
 	while(len)
- 800070a:	79fb      	ldrb	r3, [r7, #7]
- 800070c:	2b00      	cmp	r3, #0
- 800070e:	d1f2      	bne.n	80006f6 <I2C_MasterSendData+0x80>
-		}
+ 800070c:	79fb      	ldrb	r3, [r7, #7]
+ 800070e:	2b00      	cmp	r3, #0
+ 8000710:	d1e7      	bne.n	80006e2 <I2C_MasterSendData+0x6c>
+
 	}
 
 	// 6. Close the communication
 	// 6.1 wait for Txe = 1 and BTF = 1 before generating the stop condition
-	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_FLAG_TxE))));
- 8000710:	bf00      	nop
- 8000712:	68fb      	ldr	r3, [r7, #12]
- 8000714:	689b      	ldr	r3, [r3, #8]
- 8000716:	f44f 7180 	mov.w	r1, #256	@ 0x100
+	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(I2C_FLAG_TxE))));
+ 8000712:	bf00      	nop
+ 8000714:	68fb      	ldr	r3, [r7, #12]
+ 8000716:	689b      	ldr	r3, [r3, #8]
+ 8000718:	2180      	movs	r1, #128	@ 0x80
  800071a:	4618      	mov	r0, r3
  800071c:	f7ff ff98 	bl	8000650 <I2C_GetFlagStatus>
  8000720:	4603      	mov	r3, r0
  8000722:	2b00      	cmp	r3, #0
- 8000724:	d0f5      	beq.n	8000712 <I2C_MasterSendData+0x9c>
-	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_FLAG_BTF))));
+ 8000724:	d0f6      	beq.n	8000714 <I2C_MasterSendData+0x9e>
+	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(I2C_FLAG_BTF))));
  8000726:	bf00      	nop
  8000728:	68fb      	ldr	r3, [r7, #12]
  800072a:	689b      	ldr	r3, [r3, #8]
- 800072c:	2108      	movs	r1, #8
+ 800072c:	2104      	movs	r1, #4
  800072e:	4618      	mov	r0, r3
  8000730:	f7ff ff8e 	bl	8000650 <I2C_GetFlagStatus>
  8000734:	4603      	mov	r3, r0

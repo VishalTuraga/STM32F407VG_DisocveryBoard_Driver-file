@@ -1271,12 +1271,12 @@ LOAD C:/ST/STM32CubeIDE_1.16.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
  .debug_macro   0x00002e3f       0xc2 ./drivers/Src/stm32f407xx_gpio_driver.o
  .debug_macro   0x00002f01       0xb8 ./drivers/Src/stm32f407xx_gpio_driver.o
 
-.debug_line     0x00000000     0x260e
+.debug_line     0x00000000     0x2626
  .debug_line    0x00000000      0x71e ./Src/009I2CTxTesting.o
  .debug_line    0x0000071e       0x7b ./Startup/startup_stm32f407vgtx.o
- .debug_line    0x00000799      0xdd2 ./drivers/Src/stm32f407x_i2c.o
- .debug_line    0x0000156b      0x5b2 ./drivers/Src/stm32f407xx_RCC.o
- .debug_line    0x00001b1d      0xaf1 ./drivers/Src/stm32f407xx_gpio_driver.o
+ .debug_line    0x00000799      0xdea ./drivers/Src/stm32f407x_i2c.o
+ .debug_line    0x00001583      0x5b2 ./drivers/Src/stm32f407xx_RCC.o
+ .debug_line    0x00001b35      0xaf1 ./drivers/Src/stm32f407xx_gpio_driver.o
 
 .debug_str      0x00000000     0xb86e
  .debug_str     0x00000000     0xb29f ./Src/009I2CTxTesting.o

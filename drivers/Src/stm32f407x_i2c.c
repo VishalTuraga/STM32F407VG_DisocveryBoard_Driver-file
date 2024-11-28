@@ -351,30 +351,30 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *TxBuffer, uint8_t len
 	SlaveAddr &= ~(1);
 	pI2CHandle->pI2Cx->DR = SlaveAddr;
 
-	// 4. ADDR bit is set if it receives an ACK
-	if(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_FLAG_ADDR)))
-	{
-		// The ADDR bit is set which means that the master received an ack. Now we should reset this ADDR bit
-		// read SR1 and SR2 to clear this bit
-		I2C_ClearADDRFlag(pI2CHandle);
-	}
+	// 4. Confirm that address phase is completed by checking the ADDR flag in the SR1
+	while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx,(I2C_FLAG_ADDR)));
+
+	// The ADDR bit is set which means that the master received an ack. Now we should reset this ADDR bit
+	// read SR1 and SR2 to clear this bit
+	I2C_ClearADDRFlag(pI2CHandle);
+
 
 	// 5. Send data till len becomes zero. We don't have to check for ack every time as it is handled by the hardware
 	while(len)
 	{
 		// wait till Txe is 1 indicating that DR is empty and ready to be filled with data
-		while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_FLAG_TxE))))
-		{
-			pI2CHandle->pI2Cx->DR = *TxBuffer;
-			TxBuffer++;
-			len--;
-		}
+		while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(I2C_FLAG_TxE))));
+
+		pI2CHandle->pI2Cx->DR = *TxBuffer;
+		TxBuffer++;
+		len--;
+
 	}
 
 	// 6. Close the communication
 	// 6.1 wait for Txe = 1 and BTF = 1 before generating the stop condition
-	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_FLAG_TxE))));
-	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_FLAG_BTF))));
+	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(I2C_FLAG_TxE))));
+	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(I2C_FLAG_BTF))));
 
 	// 6.2 Generate the stop condition (if repeated start isn't enabled)
 	if(Sr == I2C_NO_SR)
@@ -415,7 +415,7 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *RxBuffer, uint8_t 
 	pI2CHandle->pI2Cx->DR = SlaveAddr;
 
 	// 4. check if the ADDR flag is set. Wait until its set
-	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(1 << I2C_FLAG_ADDR))));
+	while(!(I2C_GetFlagStatus(pI2CHandle->pI2Cx,(I2C_FLAG_ADDR))));
 
 	// 5. Send data. If len = 1 or if len > 1
 	if(len == 1)
@@ -427,7 +427,7 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *RxBuffer, uint8_t 
 		I2C_ClearADDRFlag(pI2CHandle);
 
 		// d. wait till RXNE is set
-		while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, (1 << I2C_FLAG_RxNE)));
+		while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, (I2C_FLAG_RxNE)));
 
 		// b. send stop condition if repeated start is disabled
 		if(Sr == I2C_NO_SR)
@@ -449,7 +449,7 @@ void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *RxBuffer, uint8_t 
 		while(len > 0)
 		{
 			// d. wait till RXNE becomes 1
-			while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, (1 << I2C_FLAG_RxNE)));
+			while(!I2C_GetFlagStatus(pI2CHandle->pI2Cx, (I2C_FLAG_RxNE)));
 
 			if(len == 2)
 			{
